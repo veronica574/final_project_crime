@@ -1,0 +1,12 @@
+---
+title: "final_project"
+author: "Qianshu Wang"
+date: "2017/12/3"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Crime Statistics
