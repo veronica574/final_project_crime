@@ -12,7 +12,12 @@ library(janitor)
 ```
 
 ```{r setup, include=FALSE}
-crime_2017 = read.csv("../data/NYPD_Complaint_Data_Current_YTD.csv") %>%
-clean_names()
+nyc_crime_2017 = read.csv("./NYPD_Complaint_Data_Current_YTD.csv") %>%
+  clean_names()
+
+nyc_crime_2017 = nyc_crime_2017 %>%
+  mutate(cmplnt_fr_dt = as.Date(cmplnt_fr_dt, "%m/%d/%Y"), cmplnt_to_dt = as.Date(cmplnt_to_dt, "%m/%d/%Y")) %>%
+  select(cmplnt_fr_dt, cmplnt_fr_tm, ky_cd, ofns_desc, law_cat_cd, boro_nm, prem_typ_desc, longitude, latitude) %>%
+  rename(date = cmplnt_fr_dt, time = cmplnt_fr_tm, prem_typ = prem_typ_desc, ofns_type = law_cat_cd, boro = boro_nm)
 ```
 
