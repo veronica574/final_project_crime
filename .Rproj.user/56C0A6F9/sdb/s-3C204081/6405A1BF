@@ -1,14 +1,14 @@
 {
     "collab_server" : "",
-    "contents" : "---\ntitle: \"final_project\"\nauthor: \"Qianshu Wang\"\ndate: \"2017/12/3\"\noutput: html_document\n---\n```{r}\nlibrary(tidyverse)\nlibrary(rvest)\nlibrary(httr)\nlibrary(janitor)\n```\n\n```{r setup, include=FALSE}\ncrime_2017 = read.csv(\"../data/NYPD_Complaint_Data_Current_YTD.csv\") %>%\nclean_names()\n```\n\n",
+    "contents" : "---\ntitle: \"final_project\"\nauthor: \"Qianshu Wang\"\ndate: \"2017/12/3\"\noutput: html_document\n---\n```{r}\nlibrary(tidyverse)\nlibrary(rvest)\nlibrary(httr)\nlibrary(janitor)\n```\n\n```{r setup, include=FALSE}\nnyc_crime_2017 = read.csv(\"./NYPD_Complaint_Data_Current_YTD.csv\") %>%\n  clean_names()\n\nnyc_crime_2017 = nyc_crime_2017 %>%\n  mutate(cmplnt_fr_dt = as.Date(cmplnt_fr_dt, \"%m/%d/%Y\")) %>%\n  select(cmplnt_fr_dt, cmplnt_fr_tm, ky_cd, ofns_desc, law_cat_cd, boro_nm, prem_typ_desc, longitude, latitude) %>%\n  rename(date = cmplnt_fr_dt, time = cmplnt_fr_tm, prem_typ = prem_typ_desc, ofns_type = law_cat_cd, boro = boro_nm)\n\ncrime_2017 = nyc_crime_2017 %>%\n    mutate(prem_typ = as.character(prem_typ))\n    crime_2017$prem_typ[grep(\"RESIDENCE\",crime_2017$prem_typ)] = \"RESIDENCE\"\n    \n```\n\n```{r}\n\n```\n\n",
     "created" : 1512496657536.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "1396113550",
+    "hash" : "123781270",
     "id" : "6405A1BF",
-    "lastKnownWriteTime" : 1512500425,
-    "last_content_update" : 1512500425405,
+    "lastKnownWriteTime" : 1512508261,
+    "last_content_update" : 1512508261678,
     "path" : "~/final_project_crime/final_project.Rmd",
     "project_path" : "final_project.Rmd",
     "properties" : {
