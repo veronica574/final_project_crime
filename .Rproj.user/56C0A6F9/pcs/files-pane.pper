@@ -1,0 +1,9 @@
+{
+    "path" : "~/final_project_crime",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}

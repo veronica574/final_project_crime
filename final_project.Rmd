@@ -4,9 +4,15 @@ author: "Qianshu Wang"
 date: "2017/12/3"
 output: html_document
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+library(tidyverse)
+library(rvest)
+library(httr)
+library(janitor)
 ```
 
-## Crime Statistics
+```{r setup, include=FALSE}
+crime_2017 = read.csv("../data/NYPD_Complaint_Data_Current_YTD.csv") %>%
+clean_names()
+```
+
