@@ -143,3 +143,66 @@ ggplot(crime_tidy2, aes(x = date, y = crime_count, color = ofns_type)) +
 ```
 
 
+
+
+Top 10 words in of offense description:
+
+
+```{r}
+library(tidytext)
+
+crime_words = nyc_crime_2017 %>%
+  select(-longitude, -latitude) %>%
+  mutate(ofns_desc = str_to_lower(ofns_desc),
+  ofns_desc = as.character(ofns_desc)) %>%
+  unnest_tokens(word, ofns_desc)
+
+data(stop_words)
+
+crime_word_tidy = 
+  anti_join(crime_words, stop_words)
+
+
+crime_word_tidy %>% 
+  count(word, sort = TRUE) %>% 
+  top_n(10) %>% 
+  mutate(word = fct_reorder(word, n)) %>% 
+  ggplot(aes(x = word, y = n)) + 
+  geom_bar(stat = "identity", fill = "blue", alpha = .6) + 
+  coord_flip()
+```
+
+
+Comparison of distinct words in offense type of violation and felony.
+
+```{r}
+word_ratios = crime_word_tidy %>%
+  filter(ofns_type %in% c("VIOLATION" , "FELONY")) %>%
+  count(word, ofns_type) %>%
+  group_by(word) %>% 
+  filter(sum(n) >= 5) %>%
+  ungroup() %>%
+  spread(ofns_type, n, fill = 0) %>%
+  mutate(
+    violation_odds = (VIOLATION + 1) / (sum(VIOLATION) + 1),
+    felony_odds = (FELONY + 1) / (sum(FELONY) + 1),
+    log_OR = log(felony_odds / violation_odds)
+  ) %>%
+  arrange(desc(log_OR)) 
+
+
+word_ratios %>%
+  mutate(pos_log_OR = ifelse(log_OR > 0,  "felony_odds >violation_odds" ,"violation_odds > felony_odds")) %>% 
+  group_by(pos_log_OR) %>%
+  top_n(10, abs(log_OR)) %>%
+  ungroup() %>%
+  mutate(word = fct_reorder(word, log_OR)) %>%
+  ggplot(aes(word, log_OR, fill = pos_log_OR)) +
+  geom_col() +
+  coord_flip() +
+  ylab("log odds ratio (felony_odds/violation_odds)") +
+  scale_fill_discrete(name = "") +
+  theme(legend.position = "bottom")
+
+```
+
