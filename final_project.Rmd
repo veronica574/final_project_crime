@@ -159,6 +159,8 @@ library(gridExtra)
 grid.arrange(crimetotal, crimerate, ncol = 2)
 ```
 
+#part???
+## tidy data
 ```{r}
 crime_type = nyc_crime_2017 %>%
     mutate(prem_typ=as.character(prem_typ),
@@ -168,7 +170,10 @@ crime_type = nyc_crime_2017 %>%
     crime_type$prem_typ[grep("RESIDENCE",crime_type$prem_typ)] = "RESIDENCE"
     crime_type$prem_typ[crime_type$prem_typ==""]<-"OTHER"
     crime_type$prem_typ[grep("COMMERCIAL",crime_type$prem_typ)] = "COMMERCIAL BLDG"
-    
+```
+ 
+## Build a function to get the most prevalent crimes in each boro
+```{r}
 place_offense = function(x){
   crime_boro = crime_type %>% 
   filter(boro == x) %>%
@@ -194,13 +199,11 @@ for (i in 1:4) {
   return(mat)
 }
 ```
-* get results of five boros in nyc
+## get results
 ```{r}
 boro = crime_type %>% distinct(boro) %>% pull()
 place_offense_result = map(boro,place_offense)
-```
-* get the description in each boro
-```{r}
+
 boro_plot = vector("list", length = 5)
 for (i in 1:5) {
 df_boro = as.data.frame(place_offense_result[i])
@@ -213,12 +216,20 @@ boro_plot[[i]] = crime_type %>%
   filter(prem_typ %in% c("STREET","RESIDENCE"),
          ofns_desc %in% boro_ofns) %>%
   ggplot(aes(x = prem_typ,fill = ofns_desc)) + geom_bar() + coord_flip() + theme_bw() +
-  theme(axis.title=element_blank())
+  theme(axis.title=element_blank()) 
 }  
+
+boro_plot[[1]]= boro_plot[[1]] + ggtitle("Figure b - Manhattan" )
+boro_plot[[2]]= boro_plot[[2]] + ggtitle("Figure c - Brooklyn")
+boro_plot[[3]]= boro_plot[[3]] + ggtitle("Figure d - Staten Island")
+boro_plot[[4]]= boro_plot[[4]] + ggtitle("Figure e - Queens")
+boro_plot[[5]]= boro_plot[[5]] + ggtitle("Figure f - Bronx")
 ```
-* visualize the component of the most popular crime types in each boro
+
+## Illustrate the result
 ```{r}
 library(gridExtra)
+library(grid)
 place_boro = crime_type %>%
   group_by(prem_typ) %>%
   summarize(crime = n()) %>%
@@ -226,16 +237,27 @@ place_boro = crime_type %>%
   top_n(5)
   top_place = place_boro$prem_typ
  
-   place_boro_plot = crime_type %>%
+place_boro_plot = crime_type %>%
     filter(prem_typ %in% top_place) %>%
     ggplot(aes(x=prem_typ,fill = boro)) + geom_bar() + theme_bw() + theme(axis.text.x = element_text(angle = 15, hjust=1)) +
-    labs(title = "Five Top Places Where Crimes Usually Happen",
+    labs(title = "Figure a - Crime Counts Against Places", 
     x = "Place",
-    y = "Frequency")
+    y = "Counts")
 
- 
-grid.arrange(place_boro_plot,boro_plot[[1]],boro_plot[[2]],boro_plot[[3]],boro_plot[[4]],boro_plot[[5]],ncol=2,top = "Commen Types of Crime in Each Boro")
+title = textGrob("Commen Criminal Crimes in Each Boro", gp=gpar(fontsize=25)) 
+grid.arrange(place_boro_plot,boro_plot[[1]],
+             boro_plot[[2]],boro_plot[[3]],
+             boro_plot[[4]],boro_plot[[5]],
+             ncol=2, top = title)
 ```
+
+** Comments**  
+*  In Figure a, we presented the top five places where crimes usually happlen across five boros in NYC and it shows that STREET and RESIDENCE are the most unsafe places, then we will look furtherly about the major crime types in these two places for each boro.  
+*  We obtian the information of crime counts and types through the width and partitioning of bars. It is obviously to conclude that the prevalence of assault, harrassment and criminal mischief are much higher compared to other crimes in most boros.  
+*  In residence, the occurence of harrassment and assult is more prevalent, while prtit larcency and criminal mischief represent more percentage of criminal types in street.  
+*  Next, we want to compare the major criminal types in different boros. From Figure b-f, we found that the distribution of crimes are similar among Manhattan, Brooklyn, State Island and Queen. However, the characteristic of crimes in Bronx appeares to be more complex. Specificlly, the nature of crimes in Bronx is usually more serious than the other four boros, with the occurence of FELONY ASSAULT and DANGEROUS DRUGS, which belong to felony.  
+*  Overall,the safty level in Manhattan, State Island and Queens in relatively higher
+
 
 ## Read crime number and visualization
 ```{r}
@@ -261,23 +283,6 @@ nyc_crime_population = left_join(population, crime_number, by = "boro") %>%
 
 ```
 
-## Read data: income
-```{r}
-url = "http://www.baruch.cuny.edu/nycdata/income-taxes/med_hhold_income.htm"
-
-household_income = read_html(url)
-
-income_by_region = (household_income %>%
-                      html_nodes(css = "table"))[[1]] %>%
-  html_table() %>%
-  .[c(8,9,10,11,12), c(3,4)]
-  as_tibble()
-  
-income_by_region = income_by_region %>%
-  clean_names() %>%
-  mutate(boro = x3, median_income = x4) %>%
-  select(-x3, -x4) 
-```
 
 ## Corelation between median income and crime rate
 ```{r}
