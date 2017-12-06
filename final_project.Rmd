@@ -160,7 +160,78 @@ ggplot(crime_tidy2, aes(x = date, y = crime_count, color = ofns_type)) +
     theme(legend.position = "bottom")
 ```
 
+## Read crime number and visualization
+```{r}
+nyc_crime = read_csv("./NYPD_Complaint_Data_Current_YTD.csv") %>%
+  clean_names() %>%
+  select(boro = boro_nm)
 
+crime_number = nyc_crime %>%
+  group_by(boro) %>%
+  summarise(n = n()) 
+
+crime_number %>%
+  ggplot(aes(x = boro, y = n, fill = boro)) + geom_bar(stat = "identity", alpha = 0.8, width = 0.8) +
+  labs(title = "Number of Crimes in each borough",
+       x = "Borough",
+       y = "Number of crimes") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none")
+```
+
+The main propose of this part is to analyze: 1. the difference of crime cases among five boroughs (Manhattan, Bronx, Brooklyn, Queens and Staten Island) in New York City. From the result, we can clearly conclude that due to its smaller size, staten island has the lowest number of crimes. The borough with the largest number of crime cases is Brooklyn, followed by Manhattan, Bronx and Queens. The number of crime cases in these four boroughs are slightly different from each other.
+
+## Read data: population
+```{r}
+population = read_csv("./NYC_Population_by_Borough.csv") %>%
+  mutate(boro = Borough) %>%
+  select(-Borough)
+```
+
+## Calculate the crime rate by borough
+```{r}
+nyc_crime_population = left_join(population, crime_number, by = "boro") %>%
+  clean_names() %>%
+  mutate(population = as.numeric(population)) %>%
+  mutate(crime_rate = n / population)
+
+```
+
+## Read data: income
+```{r}
+url = "http://www.baruch.cuny.edu/nycdata/income-taxes/med_hhold_income.htm"
+
+household_income = read_html(url)
+
+income_by_region = (household_income %>%
+                      html_nodes(css = "table"))[[1]] %>%
+  html_table() %>%
+  .[c(8,9,10,11,12), c(3,4)]
+  as_tibble()
+  
+income_by_region = income_by_region %>%
+  clean_names() %>%
+  mutate(boro = x3, median_income = x4) %>%
+  select(-x3, -x4) 
+```
+
+## Corelation between median income and crime rate
+```{r}
+income = read_csv("./NYC_Income_by_Borough.csv") %>%
+  clean_names() %>%
+  mutate(boro = borough) %>%
+  select(-borough)
+
+crime_income = left_join(income, nyc_crime_population, by = "boro")
+
+crime_income %>%
+  ggplot(aes(x = income, y = crime_rate, color = income)) + geom_point(alpha = 0.5) + geom_smooth() +
+  labs(title = "Corelation between family median income and crime rate in each borough",
+       x = "Income Range",
+       y = "Crime rate")
+```
+
+
+In addition, we have a strong interest in finding potential factors that may associated with criminal rate. In this case, we choose household income level. After reading data from the web, data cleaning and data visualization, we are surprized to see from the scatter plot: Both lower-income borough and higher-income borough have an extremely high crime rate. For example, Bronx borough's family median income is 35176 dollars, associated with a crime rate of 0.029. That is, we expect 29 crime cases among every 1000 people. In contrast, Family income ranged between 60000 dollars to 70000 dollars tends to have the lowerest crime rate. Taking Queens as an example, we expect only 15 crime cases among every 1000 people.
 
 
 Top 10 words in of offense description:
@@ -190,6 +261,8 @@ crime_word_tidy %>%
   geom_bar(stat = "identity", fill = "blue", alpha = .6) + 
   coord_flip()
 ```
+
+
 
 
 Comparison of distinct words in offense type of violation and felony.
