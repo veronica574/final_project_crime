@@ -28,10 +28,7 @@ nyc_crime_2017 = nyc_crime_2017 %>%
   filter(year(cmplnt_fr_dt)  == 2017) %>%
   rename(date = cmplnt_fr_dt, time = cmplnt_fr_tm, prem_typ = prem_typ_desc, ofns_type = law_cat_cd, boro = boro_nm)
 
-crime_2017 = nyc_crime_2017 %>%
-    mutate(prem_typ = as.character(prem_typ))
-    crime_2017$prem_typ[grep("RESIDENCE",crime_2017$prem_typ)] = "RESIDENCE"
-    
+
 ```
 
 # Motivation 
@@ -163,12 +160,14 @@ grid.arrange(crimetotal, crimerate, ncol = 2)
 ```
 
 ```{r}
-crime_type = crime_2017 %>%
+crime_type = nyc_crime_2017 %>%
     mutate(prem_typ=as.character(prem_typ),
            boro=as.character(boro),
            ofns_type=as.character(ofns_type),
            ofns_desc=as.character(ofns_desc))
     crime_type$prem_typ[grep("RESIDENCE",crime_type$prem_typ)] = "RESIDENCE"
+    crime_type$prem_typ[crime_type$prem_typ==""]<-"OTHER"
+    crime_type$prem_typ[grep("COMMERCIAL",crime_type$prem_typ)] = "COMMERCIAL BLDG"
     
 place_offense = function(x){
   crime_boro = crime_type %>% 
@@ -176,7 +175,7 @@ place_offense = function(x){
   group_by(prem_typ) %>%
   summarize(crime = n()) %>%
   arrange(desc(crime)) %>% 
-  top_n(10)
+  top_n(4)
   top_place = crime_boro$prem_typ
 
   mat <- matrix(ncol = 3, nrow = 4)
@@ -189,17 +188,14 @@ for (i in 1:4) {
     arrange(desc(crime)) %>%
     top_n(3) 
     top_offense = offense_select$ofns_desc
-    mat[i,] <- top_offense
+    mat[i,] = top_offense
 }
+  mat <- cbind(top_place[1:4],mat)
   return(mat)
 }
-
-
-place_offense("QUEENS")
-place_offense("BROOKLYN")
-place_offense("STATEN ISLAND")
-place_offense("BRONX")
-place_offense("MANHATTAN")
+```
+```{r}
+place_offense_result = map(boro,place_offense)
 ```
 
 ## Read crime number and visualization
