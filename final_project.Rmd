@@ -12,6 +12,9 @@ library(httr)
 library(janitor)
 library(lubridate)
 library(readxl)
+library(plotly)
+library(forcats)
+library(stringr)
 theme_set(theme_bw())
 ```
 
@@ -30,6 +33,18 @@ crime_2017 = nyc_crime_2017 %>%
     crime_2017$prem_typ[grep("RESIDENCE",crime_2017$prem_typ)] = "RESIDENCE"
     
 ```
+
+Bar chart showing crime number and offense type in different boro:
+
+
+```{r}
+barplot = nyc_crime_2017 %>% 
+  mutate(boro = fct_infreq(boro)) %>%
+  ggplot(aes(x = boro, fill = ofns_type)) + geom_bar() 
+  
+ggplotly(barplot)
+```
+
 
 
 *Collect historic data of crimes
