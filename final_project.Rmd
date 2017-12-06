@@ -160,7 +160,8 @@ ggarrange(crimetotal, crimerate, ncol = 2, common.legend = TRUE)
 Here, we would like to make a deeper investigation about the crime numbers and crime rate based on each month this year. In order to calculate the crime rate, we need to use the population data of NYC. We get this data from the website http://www1.nyc.gov/site/planning/data-maps/nyc-population/current-future-populations.page.We can see from the results that Brooklyn has the most crime numbers this year, but in crime rate, Bronx is the worst. Queens is relatively safer. Also, we could find that in February, there are usually fewer crimes, that's probably because the weather in February is usually the coldest, makes criminal less willing to go on the street.
 
 ## Common crimes types in each boro
-```{r}
+### Build a function to get the most prevalent crimes in each boro and illustrate the result.
+```{r,echo=FALSE}
 crime_type = nyc_crime_2017 %>%
     mutate(prem_typ=as.character(prem_typ),
            boro=as.character(boro),
@@ -171,8 +172,8 @@ crime_type = nyc_crime_2017 %>%
     crime_type$prem_typ[grep("COMMERCIAL",crime_type$prem_typ)] = "COMMERCIAL BLDG"
 ```
  
-### Build a function to get the most prevalent crimes in each boro
-```{r}
+
+```{r,echo=FALSE}
 place_offense = function(x){
   crime_boro = crime_type %>% 
   filter(boro == x) %>%
@@ -199,8 +200,8 @@ for (i in 1:4) {
 }
 ```
 
-### get results
-```{r}
+
+```{r,echo=FALSE}
 boro = crime_type %>% distinct(boro) %>% pull()
 place_offense_result = map(boro,place_offense)
 
@@ -226,8 +227,8 @@ boro_plot[[4]]= boro_plot[[4]] + ggtitle("Figure e - Queens")
 boro_plot[[5]]= boro_plot[[5]] + ggtitle("Figure f - Bronx")
 ```
 
-### Illustrate the result
-```{r}
+
+```{r,include=FALSE}
 library(gridExtra)
 library(grid)
 place_boro = crime_type %>%
@@ -244,11 +245,15 @@ place_boro_plot = crime_type %>%
     x = "Place",
     y = "Counts")
 
-title = textGrob("Commen Criminal Crimes in Each Boro", gp=gpar(fontsize=25)) 
+title = textGrob("Commen Criminal Types in Each Boro", gp=gpar(fontsize=25)) 
 grid.arrange(place_boro_plot,boro_plot[[1]],
              boro_plot[[2]],boro_plot[[3]],
              boro_plot[[4]],boro_plot[[5]],
              ncol=2, top = title)
+```
+
+```{r,echo=FALSE}
+knitr::include_graphics('./Rplot.jpeg')
 ```
 
 **Comments** 
