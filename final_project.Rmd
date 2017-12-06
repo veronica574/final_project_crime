@@ -2,7 +2,10 @@
 title: "final_project"
 author: "Qianshu Wang, He Jin, Siyuan Ding, Chuhan Zhou, Weijie Liu"
 date: "2017/12/3"
-output: html_document
+output:
+  html_document: 
+    toc: true
+    toc_float: true
 ---
 ```{r, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, message = FALSE, warning = FALSE)
@@ -103,9 +106,7 @@ barplot = nyc_crime_2017 %>%
 ggplotly(barplot)
 ```
 
-The graph reveals the number of crime vs boro. Among 5 boros, Brooklyn has the highest number of crime in the frist 10 months in 2017. Offense type includes felony, misdemeanor and violation. Misdemeanor is the most frequent offense types across these 5 boros. 
-
-The count of different type of crimes based on 2017 data
+And also in different months:
 ```{r}
 nyc_crime_2017 %>% 
   group_by(date, ofns_type) %>% 
@@ -115,6 +116,9 @@ nyc_crime_2017 %>%
     theme(legend.position = "bottom")
 ```
 
+The first graph reveals the number of crime vs boro. Among 5 boros, Brooklyn has the highest number of crime in the frist 10 months in 2017. Offense type includes felony, misdemeanor and violation. Misdemeanor is the most frequent offense types across these 5 boros. Next, we made a second plot showing total crime based on different offense type in the frist 10 months in 201, the results are similar, also indicate that Misdemeanor is significantly higher than VIOLATION and FELONY.
+
+## Crime numbers and crime rate this year
 We then focused on crime data of current year.
 
 Make a plot of crime count versus hour in a day and group by boro. It shows that most crimes happened between 15:00 and 20:00.
@@ -126,10 +130,10 @@ nyc_crime_2017 %>%
   ggplot(aes(x = hour, y = n, color = boro)) + geom_point(alpha = 0.5) + geom_line()
 ```
 
-Make a crime rate plot based on 2017 data
+Make a plot showing the crime numbers and crime rate based each months
 ```{r}
 crime_tidy = nyc_crime_2017 %>% 
-  mutate(month = month(date))%>% 
+  mutate(month = month(date)) %>% 
   group_by(month,boro) %>% 
   summarize(crime_count = n())
 
@@ -153,8 +157,9 @@ library(ggpubr)
 ggarrange(crimetotal, crimerate, ncol = 2, common.legend = TRUE)
 ```
 
+Here, we would like to make a deeper investigation about the crime numbers and crime rate based on each month this year. In order to calculate the crime rate, we need to use the population data of NYC. We get this data from the website http://www1.nyc.gov/site/planning/data-maps/nyc-population/current-future-populations.page.We can see from the results that Brooklyn has the most crime numbers this year, but in crime rate, Bronx is the worst. Queens is relatively safer. Also, we could find that in February, there are usually fewer crimes, that's probably because the weather in February is usually the coldest, makes criminal less willing to go on the street.
 
-### tidy data
+## tidy data
 ```{r}
 crime_type = nyc_crime_2017 %>%
     mutate(prem_typ=as.character(prem_typ),
