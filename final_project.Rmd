@@ -162,6 +162,45 @@ library(gridExtra)
 grid.arrange(crimetotal, crimerate, ncol = 2)
 ```
 
+```{r}
+crime_type = crime_2017 %>%
+    mutate(prem_typ=as.character(prem_typ),
+           boro=as.character(boro),
+           ofns_type=as.character(ofns_type),
+           ofns_desc=as.character(ofns_desc))
+    crime_type$prem_typ[grep("RESIDENCE",crime_type$prem_typ)] = "RESIDENCE"
+    
+place_offense = function(x){
+  crime_boro = crime_type %>% 
+  filter(boro == x) %>%
+  group_by(prem_typ) %>%
+  summarize(crime = n()) %>%
+  arrange(desc(crime)) %>% 
+  top_n(10)
+  top_place = crime_boro$prem_typ
+
+  mat <- matrix(ncol = 3, nrow = 4)
+for (i in 1:4) {
+    offense_select = crime_type %>%
+    filter(prem_typ == top_place[i],
+           boro == x) %>%
+    group_by(ofns_desc) %>%
+    summarize(crime = n()) %>%
+    arrange(desc(crime)) %>%
+    top_n(3) 
+    top_offense = offense_select$ofns_desc
+    mat[i,] <- top_offense
+}
+  return(mat)
+}
+
+
+place_offense("QUEENS")
+place_offense("BROOKLYN")
+place_offense("STATEN ISLAND")
+place_offense("BRONX")
+place_offense("MANHATTAN")
+```
 
 ## Read crime number and visualization
 ```{r}
