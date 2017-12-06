@@ -41,6 +41,7 @@ The violent crime rate in U.S increased by 3.4 percent nationwide in 2016 in US.
 The New York City Police Department provides overall crime dataset. NYPD also established a CompStat model, called [CompStat 2.0](https://compstat.nypdonline.org/2e5c3f4b-85c1-4635-83c6-22b27fe7c75c/view/89), providing greater specificity about crimes through an online interactive experience.\\
 On the official website of new york city, there is also a [Crime Map](https://maps.nyc.gov/crime/) which enables people to view crime by precinct. This map includes crimes of seven major felonies.
 
+
 Since the dataset has `r dim(nyc_crime_2017)`, we randomly sample 50000 observations and creat an interactive map showing locations where the crimes in New York City occured:
 ```{r}
 
@@ -95,7 +96,7 @@ nyc_crime_hist %>%
   ggplot(aes(x = year, y = n, fill = ofns_type)) + geom_bar(stat = "identity")
 ```
 
-Bar chart showing crime number and offense type in different boro:
+Bar chart showing crime number and offense type in different boros:
 
 
 ```{r}
@@ -105,6 +106,10 @@ barplot = nyc_crime_2017 %>%
   
 ggplotly(barplot)
 ```
+
+
+The graph reveals the number of crime vs boro. Among 5 boros, Brooklyn has the highest number of crime in the frist 10 months in 2017. Offense type includes felony, misdemeanor and violation. Misdemeanor is the most frequent offense types across these 5 boros. 
+
 
 The count of different type of crimes based on 2017 data
 ```{r}
@@ -220,7 +225,9 @@ crime_income %>%
 In addition, we have a strong interest in finding potential factors that may associated with criminal rate. In this case, we choose household income level. After reading data from the web, data cleaning and data visualization, we are surprized to see from the scatter plot: Both lower-income borough and higher-income borough have an extremely high crime rate. For example, Bronx borough's family median income is 35176 dollars, associated with a crime rate of 0.029. That is, we expect 29 crime cases among every 1000 people. In contrast, Family income ranged between 60000 dollars to 70000 dollars tends to have the lowerest crime rate. Taking Queens as an example, we expect only 15 crime cases among every 1000 people.
 
 
-Top 10 words in of offense description:
+
+
+#####Top 10 words in of offense description:
 
 
 ```{r}
@@ -249,9 +256,10 @@ crime_word_tidy %>%
 ```
 
 
+The graph analyzes top 10 words showing in offense description. The most frequent one is larceny, which appears nearly 100000 times. Other frequent words including related, petit, assault, harrassment, etc. Most of them indicated the type of crime, which is consistent with what we expect. 
 
 
-Comparison of distinct words in offense type of violation and felony.
+#####Comparison of distinct words in offense type of violation and felony.
 
 ```{r}
 word_ratios = crime_word_tidy %>%
@@ -284,3 +292,4 @@ word_ratios %>%
 
 ```
 
+The above chart compares distinct words(that is, words that appear much more frequently in one group than the other) in offense type of violation and felony. We can see that larceny, robbery, burglary,etc., appear more frequently in offense description of felony crime, while harrassment, gambling, loitering appear more frequently in offense description of violation crime. In terms of the results, we can obtain a basic picture of the difference between felony and violation. 
