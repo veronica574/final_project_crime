@@ -1,11 +1,11 @@
 ---
 title: "final_project"
-author: "Qianshu Wang"
+author: "Qianshu Wang, He Jin, Siyuan Ding, Chuhan Zhou, Weijie Liu"
 date: "2017/12/3"
 output: html_document
 ---
 ```{r, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, message = FALSE)
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, message = FALSE, warning = FALSE)
 library(tidyverse)
 library(rvest)
 library(httr)
@@ -56,20 +56,6 @@ sample %>%
 ```
 
 
-
-Bar chart showing crime number and offense type in different boro:
-
-
-```{r}
-barplot = nyc_crime_2017 %>% 
-  mutate(boro = fct_infreq(boro)) %>%
-  ggplot(aes(x = boro, fill = ofns_type)) + geom_bar() 
-  
-ggplotly(barplot)
-```
-
-
-
 *Collect historic data of crimes
 ```{r}
 nyc_hist_vio = read_excel("./historic/violation-offenses-2000-2016.xls", range = "A4:R6") %>%
@@ -108,6 +94,29 @@ nyc_crime_hist %>%
   mutate(year = as.numeric(year)) %>%
   ggplot(aes(x = year, y = n, fill = ofns_type)) + geom_bar(stat = "identity")
 ```
+
+Bar chart showing crime number and offense type in different boro:
+
+
+```{r}
+barplot = nyc_crime_2017 %>% 
+  mutate(boro = fct_infreq(boro)) %>%
+  ggplot(aes(x = boro, fill = ofns_type)) + geom_bar() 
+  
+ggplotly(barplot)
+```
+
+The count of different type of crimes based on 2017 data
+```{r}
+crime_tidy2 = nyc_crime_2017 %>% 
+  group_by(date, ofns_type) %>% 
+  summarize(crime_count = n())
+ 
+ggplot(crime_tidy2, aes(x = date, y = crime_count, color = ofns_type)) + 
+    geom_point(alpha = .6) + geom_smooth() + 
+    theme(legend.position = "bottom")
+```
+
 
 We then focused on crime data of current year.
 
@@ -149,17 +158,6 @@ grid.arrange(crimetotal, crimerate, ncol = 2)
 ```
 
 
-The count of different type of crimes based on 2017 data
-```{r}
-crime_tidy2 = nyc_crime_2017 %>% 
-  group_by(date, ofns_type) %>% 
-  summarize(crime_count = n())
- 
-ggplot(crime_tidy2, aes(x = date, y = crime_count, color = ofns_type)) + 
-    geom_point(alpha = .6) + geom_smooth() + 
-    theme(legend.position = "bottom")
-```
-
 ## Read crime number and visualization
 ```{r}
 nyc_crime = read_csv("./NYPD_Complaint_Data_Current_YTD.csv") %>%
@@ -170,18 +168,6 @@ crime_number = nyc_crime %>%
   group_by(boro) %>%
   summarise(n = n()) 
 
-crime_number %>%
-  ggplot(aes(x = boro, y = n, fill = boro)) + geom_bar(stat = "identity", alpha = 0.8, width = 0.8) +
-  labs(title = "Number of Crimes in each borough",
-       x = "Borough",
-       y = "Number of crimes") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none")
-```
-
-The main propose of this part is to analyze: 1. the difference of crime cases among five boroughs (Manhattan, Bronx, Brooklyn, Queens and Staten Island) in New York City. From the result, we can clearly conclude that due to its smaller size, staten island has the lowest number of crimes. The borough with the largest number of crime cases is Brooklyn, followed by Manhattan, Bronx and Queens. The number of crime cases in these four boroughs are slightly different from each other.
-
-## Read data: population
-```{r}
 population = read_csv("./NYC_Population_by_Borough.csv") %>%
   mutate(boro = Borough) %>%
   select(-Borough)
@@ -192,7 +178,7 @@ population = read_csv("./NYC_Population_by_Borough.csv") %>%
 nyc_crime_population = left_join(population, crime_number, by = "boro") %>%
   clean_names() %>%
   mutate(population = as.numeric(population)) %>%
-  mutate(crime_rate = n / population)
+  mutate(crime_rate = n / population * 100000)
 
 ```
 
