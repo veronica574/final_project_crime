@@ -4,13 +4,15 @@ author: "Qianshu Wang"
 date: "2017/12/3"
 output: html_document
 ---
-```{r}
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, message = FALSE)
 library(tidyverse)
 library(rvest)
 library(httr)
 library(janitor)
 library(lubridate)
 library(readxl)
+theme_set(theme_bw())
 ```
 
 ```{r setup, include=FALSE}
@@ -68,4 +70,44 @@ nyc_crime_hist %>%
   mutate(year = as.numeric(year)) %>%
   ggplot(aes(x = year, y = n, fill = ofns_type)) + geom_bar(stat = "identity")
 ```
+
+Make a crime rate plot based on 2017 data
+```{r}
+crime_tidy = nyc_crime_2017 %>% 
+  separate(date, into = c("year", "month","day"), sep = "-") %>%
+  select(-year, -day) %>% 
+  group_by(month,boro) %>% 
+  summarize(crime_count = n())
+
+crimetotal = ggplot(crime_tidy, aes(x = month, y = crime_count, color = boro)) + 
+  geom_point() + geom_path(aes(group = boro)) +
+  theme(legend.position = "bottom")
+
+crime_rate = crime_tidy %>% 
+  mutate(popluation = recode(boro, "BRONX" = 1455720,
+                             "BROOKLYN" = 2629150,
+                             "MANHATTAN" = 1643734,
+                             "QUEENS" = 2333054,
+                             "STATEN ISLAND" = 476015)) %>% 
+  mutate(crime_rate = (crime_count/popluation)*100000)
+
+crimerate = ggplot(crime_rate, aes(x = month, y = crime_rate, color = boro)) + 
+    geom_point() + geom_path(aes(group = boro)) + 
+    theme(legend.position = "bottom")
+
+library(gridExtra)
+grid.arrange(crimetotal, crimerate, ncol = 2)
+```
+
+The count of different type of crimes based on 2017 data
+```{r}
+crime_tidy2 = nyc_crime_2017 %>% 
+  group_by(date, ofns_type) %>% 
+  summarize(crime_count = n())
+ 
+ggplot(crime_tidy2, aes(x = date, y = crime_count, color = ofns_type)) + 
+    geom_point(alpha = .6) + geom_smooth() + 
+    theme(legend.position = "bottom")
+```
+
 
