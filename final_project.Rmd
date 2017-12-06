@@ -19,7 +19,7 @@ theme_set(theme_bw())
 ```
 
 ```{r setup, include=FALSE}
-nyc_crime_2017 = read.csv("./NYPD_Complaint_Data_Current_YTD.csv") %>%
+nyc_crime_2017 = read_csv("./NYPD_Complaint_Data_Current_YTD.csv") %>%
   clean_names()
 
 nyc_crime_2017 = nyc_crime_2017 %>%
@@ -34,6 +34,12 @@ crime_2017 = nyc_crime_2017 %>%
     
 ```
 
+# Motivation 
+The violent crime rate in U.S increased by 3.4 percent nationwide in 2016 in US. As an international student, as well as a New Yorker, the public safety in NYC is always a concern to us, especially after the recent terrorists attack near the World Trade Center. Thus, our group decided to make a deeper investigation of the crime data and seek out some underlying reasons which led to the increase of crime rate.
+
+# Related work
+The New York City Police Department provides overall crime dataset. NYPD also established a CompStat model, called [CompStat 2.0](https://compstat.nypdonline.org/2e5c3f4b-85c1-4635-83c6-22b27fe7c75c/view/89), providing greater specificity about crimes through an online interactive experience.\\
+On the official website of new york city, there is also a [Crime Map](https://maps.nyc.gov/crime/) which enables people to view crime by precinct. This map includes crimes of seven major felonies.
 
 Since the dataset has `r dim(nyc_crime_2017)`, we randomly sample 50000 observations and creat an interactive map showing locations where the crimes in New York City occured:
 ```{r}
@@ -103,6 +109,17 @@ nyc_crime_hist %>%
   ggplot(aes(x = year, y = n, fill = ofns_type)) + geom_bar(stat = "identity")
 ```
 
+We then focused on crime data of current year.
+
+Make a plot of crime count versus hour in a day and group by boro.
+```{r}
+nyc_crime_2017 %>%
+  mutate(hour = hour(time)) %>%
+  group_by(hour, boro) %>%
+  summarize(n = n()) %>%
+  ggplot(aes(x = hour, y = n, color = boro)) + geom_point(alpha = 0.5) + geom_line()
+```
+
 Make a crime rate plot based on 2017 data
 ```{r}
 crime_tidy = nyc_crime_2017 %>% 
@@ -130,6 +147,7 @@ crimerate = ggplot(crime_rate, aes(x = month, y = crime_rate, color = boro)) +
 library(gridExtra)
 grid.arrange(crimetotal, crimerate, ncol = 2)
 ```
+
 
 The count of different type of crimes based on 2017 data
 ```{r}
