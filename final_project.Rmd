@@ -34,6 +34,23 @@ crime_2017 = nyc_crime_2017 %>%
     
 ```
 
+
+Since the dataset has `r dim(nyc_crime_2017)`, we randomly sample 50000 observations and creat an interactive map showing locations where the crimes in New York City occured:
+```{r}
+
+sample <- nyc_crime_2017[sample(1:nrow(nyc_crime_2017), 50000,replace=FALSE),]
+
+sample %>%
+  mutate(text_label = str_c("Offense desc:", ofns_desc, ' Boro: ', boro)) %>% 
+  plot_ly(x = ~longitude, y = ~latitude, type = "scatter", mode = "markers",
+          alpha = 0.5, 
+          color = ~ofns_type,
+          text = ~text_label)
+
+```
+
+
+
 Bar chart showing crime number and offense type in different boro:
 
 
