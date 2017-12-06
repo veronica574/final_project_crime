@@ -118,7 +118,7 @@ nyc_crime_2017 %>%
 
 The first graph reveals the number of crime vs boro. Among 5 boros, Brooklyn has the highest number of crime in the frist 10 months in 2017. Offense type includes felony, misdemeanor and violation. Misdemeanor is the most frequent offense types across these 5 boros. Next, we made a second plot showing total crime based on different offense type in the frist 10 months in 201, the results are similar, also indicate that Misdemeanor is significantly higher than VIOLATION and FELONY.
 
-## Crime numbers and crime rate this year
+## Crime numbers and crime rate
 We then focused on crime data of current year.
 
 Make a plot of crime count versus hour in a day and group by boro. It shows that most crimes happened between 15:00 and 20:00.
@@ -156,10 +156,10 @@ crimerate = ggplot(crime_rate, aes(x = month, y = crime_rate, color = boro)) +
 library(ggpubr)
 ggarrange(crimetotal, crimerate, ncol = 2, common.legend = TRUE)
 ```
-
+ 
 Here, we would like to make a deeper investigation about the crime numbers and crime rate based on each month this year. In order to calculate the crime rate, we need to use the population data of NYC. We get this data from the website http://www1.nyc.gov/site/planning/data-maps/nyc-population/current-future-populations.page.We can see from the results that Brooklyn has the most crime numbers this year, but in crime rate, Bronx is the worst. Queens is relatively safer. Also, we could find that in February, there are usually fewer crimes, that's probably because the weather in February is usually the coldest, makes criminal less willing to go on the street.
 
-## tidy data
+## Common crimes types in each boro
 ```{r}
 crime_type = nyc_crime_2017 %>%
     mutate(prem_typ=as.character(prem_typ),
@@ -251,7 +251,7 @@ grid.arrange(place_boro_plot,boro_plot[[1]],
              ncol=2, top = title)
 ```
 
-**Comments**  
+**Comments** 
 *  In Figure a, we presented the top five places where crimes usually happlen across five boros in NYC and it shows that STREET and RESIDENCE are the most unsafe places, then we will look furtherly about the major crime types in these two places for each boro.  
 *  We obtian the information of crime counts and types through the width and partitioning of bars. It is obviously to conclude that the prevalence of assault, harrassment and criminal mischief are much higher compared to other crimes in most boros.  
 *  In residence, the occurence of harrassment and assult is more prevalent, while prtit larcency and criminal mischief represent more percentage of criminal types in street.  
@@ -259,8 +259,8 @@ grid.arrange(place_boro_plot,boro_plot[[1]],
 *  Overall,the safty level in Manhattan, State Island and Queens in relatively higher
 
 
-## Read crime number and visualization
-```{r}
+## Assoiciation between crime and income
+```{r, include = FALSE}
 nyc_crime = read_csv("./NYPD_Complaint_Data_Current_YTD.csv") %>%
   clean_names() %>%
   select(boro = boro_nm)
@@ -272,10 +272,7 @@ crime_number = nyc_crime %>%
 population = read_csv("./NYC_Population_by_Borough.csv") %>%
   mutate(boro = Borough) %>%
   select(-Borough)
-```
 
-## Calculate the crime rate by borough
-```{r}
 nyc_crime_population = left_join(population, crime_number, by = "boro") %>%
   clean_names() %>%
   mutate(population = as.numeric(population)) %>%
@@ -284,7 +281,7 @@ nyc_crime_population = left_join(population, crime_number, by = "boro") %>%
 ```
 
 
-## Corelation between median income and crime rate
+### Corelation between median income and crime rate
 ```{r}
 income = read_csv("./NYC_Income_by_Borough.csv") %>%
   clean_names() %>%
@@ -305,10 +302,8 @@ In addition, we have a strong interest in finding potential factors that may ass
 
 
 
-
-#####Top 10 words in of offense description:
-
-
+## Investigate offense description
+### Top 10 words in of offense description:
 ```{r}
 library(tidytext)
 
@@ -338,7 +333,7 @@ crime_word_tidy %>%
 The graph analyzes top 10 words showing in offense description. The most frequent one is larceny, which appears nearly 100000 times. Other frequent words including related, petit, assault, harrassment, etc. Most of them indicated the type of crime, which is consistent with what we expect. 
 
 
-#####Comparison of distinct words in offense type of violation and felony.
+###Comparison of distinct words in offense type of violation and felony.
 
 ```{r}
 word_ratios = crime_word_tidy %>%
