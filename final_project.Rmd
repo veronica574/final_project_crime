@@ -18,19 +18,6 @@ library(stringr)
 theme_set(theme_bw())
 ```
 
-```{r setup, include=FALSE}
-nyc_crime_2017 = read_csv("./NYPD_Complaint_Data_Current_YTD.csv") %>%
-  clean_names()
-
-nyc_crime_2017 = nyc_crime_2017 %>%
-  mutate(cmplnt_fr_dt = as.Date(cmplnt_fr_dt, "%m/%d/%Y")) %>%
-  select(cmplnt_fr_dt, cmplnt_fr_tm, ky_cd, ofns_desc, law_cat_cd, boro_nm, prem_typ_desc, longitude, latitude) %>%
-  filter(year(cmplnt_fr_dt)  == 2017) %>%
-  rename(date = cmplnt_fr_dt, time = cmplnt_fr_tm, prem_typ = prem_typ_desc, ofns_type = law_cat_cd, boro = boro_nm)
-
-
-```
-
 # Motivation 
 The violent crime rate in U.S increased by 3.4 percent nationwide in 2016 in US. As an international student, as well as a New Yorker, the public safety in NYC is always a concern to us, especially after the recent terrorists attack near the World Trade Center. Thus, our group decided to make a deeper investigation of the crime data and seek out some underlying reasons which led to the increase of crime rate.
 
@@ -38,24 +25,10 @@ The violent crime rate in U.S increased by 3.4 percent nationwide in 2016 in US.
 The New York City Police Department provides overall crime dataset. NYPD also established a CompStat model, called [CompStat 2.0](https://compstat.nypdonline.org/2e5c3f4b-85c1-4635-83c6-22b27fe7c75c/view/89), providing greater specificity about crimes through an online interactive experience.\\
 On the official website of new york city, there is also a [Crime Map](https://maps.nyc.gov/crime/) which enables people to view crime by precinct. This map includes crimes of seven major felonies.
 
+# Data analysis
+NYPD official [website](https://www1.nyc.gov/site/nypd/stats/crime-statistics/historical.page) provides citywide histroic crime data in forms of excel. We downloaded these datasets and merged them into the nyc_crime_hist. The resulting data frame contain information about the total number of offenses from 2000 to 2016 and major offense categories(felony, misdemeanor, and violation) and detailed descriptions.
 
-Since the dataset has `r dim(nyc_crime_2017)`, we randomly sample 50000 observations and creat an interactive map showing locations where the crimes in New York City occured:
-```{r}
-
-sample <- nyc_crime_2017[sample(1:nrow(nyc_crime_2017), 50000,replace=FALSE),]
-
-sample %>%
-  mutate(text_label = str_c("Offense desc:", ofns_desc, ' Boro: ', boro)) %>% 
-  plot_ly(x = ~longitude, y = ~latitude, type = "scatter", mode = "markers",
-          alpha = 0.5, 
-          color = ~ofns_type,
-          text = ~text_label)
-
-```
-
-
-*Collect historic data of crimes
-```{r}
+```{r hist}
 nyc_hist_vio = read_excel("./historic/violation-offenses-2000-2016.xls", range = "A4:R6") %>%
   mutate(ofns_type = "VIOLATION")
 
@@ -67,24 +40,52 @@ nyc_hist_felony = read_excel("./historic/non-seven-major-felony-offenses-2000-20
 
 nyc_hist_mis = read_excel("./historic/misdemeanor-offenses-2000-2016.xls", range = "A4:R21")%>%
   mutate(ofns_type = "MISDEMEANOR")
-```
 
-We combine the information of crimes in past 16 years.
-```{r}
 nyc_crime_hist = nyc_hist_mis %>%
   full_join(nyc_hist_felony) %>%
   full_join(nyc_hist_felony_7) %>%
   full_join(nyc_hist_vio) %>%
   mutate(ofns_type = as.factor(ofns_type), ofns_desc = OFFENSE) %>%
   select(-OFFENSE)
+```
 
+We focus our efforts on the data of current year 2017 which is obtained from [NYC_OpenData](https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Current-YTD/5uac-w243). It includes all valid felony, misdemeanor, and violation crimes reported to the NYPD till October in this year. The latest update of this dataset is October 25, 2017. 
+
+```{r 2017}
+nyc_crime_2017 = read_csv("./NYPD_Complaint_Data_Current_YTD.csv") %>%
+  clean_names()
+
+nyc_crime_2017 = nyc_crime_2017 %>%
+  mutate(cmplnt_fr_dt = as.Date(cmplnt_fr_dt, "%m/%d/%Y")) %>%
+  select(cmplnt_fr_dt, cmplnt_fr_tm, ky_cd, ofns_desc, law_cat_cd, boro_nm, prem_typ_desc, longitude, latitude) %>%
+  filter(year(cmplnt_fr_dt)  == 2017) %>%
+  rename(date = cmplnt_fr_dt, time = cmplnt_fr_tm, prem_typ = prem_typ_desc, ofns_type = law_cat_cd, boro = boro_nm)
+```
+
+
+## Map of crimes
+Since the dataset has `r dim(nyc_crime_2017)`, we randomly sample 50000 observations and creat an interactive map showing locations where the crimes in New York City occured:
+```{r}
+sample <- nyc_crime_2017[sample(1:nrow(nyc_crime_2017), 50000,replace=FALSE),]
+
+sample %>%
+  mutate(text_label = str_c("Offense desc:", ofns_desc, ' Boro: ', boro)) %>% 
+  plot_ly(x = ~longitude, y = ~latitude, type = "scatter", mode = "markers",
+          alpha = 0.5, 
+          color = ~ofns_type,
+          text = ~text_label)
+```
+
+## Crimes types analysis
+The historic data shows the trend of total crime numbers over years. We can see that the total number of crimes are decreasing since 2000. After 2005, the crimes numbers of misdemeanor increased and dropped again after 2010.
+```{r}
 nyc_crime_hist = nyc_crime_hist %>%
   gather(key = year, value = count, "2000":"2016") %>%
   group_by(year, ofns_type) %>%
   summarize(n = sum(count)/12) %>%
   full_join(nyc_crime_2017 %>%
   group_by(ofns_type) %>%
-  summarize(n = n()/10) %>%
+  summarize(n = n()/9) %>%
   mutate(year = "2017")) %>%
   ungroup()
 
@@ -93,9 +94,7 @@ nyc_crime_hist %>%
   ggplot(aes(x = year, y = n, fill = ofns_type)) + geom_bar(stat = "identity")
 ```
 
-Bar chart showing crime number and offense type in different boros:
-
-
+In 2017, we plot a bar chart showing crime number and offense type in different boros:
 ```{r}
 barplot = nyc_crime_2017 %>% 
   mutate(boro = fct_infreq(boro)) %>%
@@ -104,25 +103,21 @@ barplot = nyc_crime_2017 %>%
 ggplotly(barplot)
 ```
 
-
 The graph reveals the number of crime vs boro. Among 5 boros, Brooklyn has the highest number of crime in the frist 10 months in 2017. Offense type includes felony, misdemeanor and violation. Misdemeanor is the most frequent offense types across these 5 boros. 
-
 
 The count of different type of crimes based on 2017 data
 ```{r}
-crime_tidy2 = nyc_crime_2017 %>% 
+nyc_crime_2017 %>% 
   group_by(date, ofns_type) %>% 
-  summarize(crime_count = n())
- 
-ggplot(crime_tidy2, aes(x = date, y = crime_count, color = ofns_type)) + 
+  summarize(crime_count = n()) %>%
+  ggplot(aes(x = date, y = crime_count, color = ofns_type)) + 
     geom_point(alpha = .6) + geom_smooth() + 
     theme(legend.position = "bottom")
 ```
 
-
 We then focused on crime data of current year.
 
-Make a plot of crime count versus hour in a day and group by boro.
+Make a plot of crime count versus hour in a day and group by boro. It shows that most crimes happened between 15:00 and 20:00.
 ```{r}
 nyc_crime_2017 %>%
   mutate(hour = hour(time)) %>%
@@ -134,8 +129,7 @@ nyc_crime_2017 %>%
 Make a crime rate plot based on 2017 data
 ```{r}
 crime_tidy = nyc_crime_2017 %>% 
-  separate(date, into = c("year", "month","day"), sep = "-") %>%
-  select(-year, -day) %>% 
+  mutate(month = month(date))%>% 
   group_by(month,boro) %>% 
   summarize(crime_count = n())
 
@@ -155,12 +149,12 @@ crimerate = ggplot(crime_rate, aes(x = month, y = crime_rate, color = boro)) +
     geom_point() + geom_path(aes(group = boro)) + 
     theme(legend.position = "bottom")
 
-library(gridExtra)
-grid.arrange(crimetotal, crimerate, ncol = 2)
+library(ggpubr)
+ggarrange(crimetotal, crimerate, ncol = 2, common.legend = TRUE)
 ```
 
-#part???
-## tidy data
+
+### tidy data
 ```{r}
 crime_type = nyc_crime_2017 %>%
     mutate(prem_typ=as.character(prem_typ),
@@ -172,7 +166,7 @@ crime_type = nyc_crime_2017 %>%
     crime_type$prem_typ[grep("COMMERCIAL",crime_type$prem_typ)] = "COMMERCIAL BLDG"
 ```
  
-## Build a function to get the most prevalent crimes in each boro
+### Build a function to get the most prevalent crimes in each boro
 ```{r}
 place_offense = function(x){
   crime_boro = crime_type %>% 
@@ -199,7 +193,8 @@ for (i in 1:4) {
   return(mat)
 }
 ```
-## get results
+
+### get results
 ```{r}
 boro = crime_type %>% distinct(boro) %>% pull()
 place_offense_result = map(boro,place_offense)
@@ -226,7 +221,7 @@ boro_plot[[4]]= boro_plot[[4]] + ggtitle("Figure e - Queens")
 boro_plot[[5]]= boro_plot[[5]] + ggtitle("Figure f - Bronx")
 ```
 
-## Illustrate the result
+### Illustrate the result
 ```{r}
 library(gridExtra)
 library(grid)
@@ -251,7 +246,7 @@ grid.arrange(place_boro_plot,boro_plot[[1]],
              ncol=2, top = title)
 ```
 
-** Comments**  
+**Comments**  
 *  In Figure a, we presented the top five places where crimes usually happlen across five boros in NYC and it shows that STREET and RESIDENCE are the most unsafe places, then we will look furtherly about the major crime types in these two places for each boro.  
 *  We obtian the information of crime counts and types through the width and partitioning of bars. It is obviously to conclude that the prevalence of assault, harrassment and criminal mischief are much higher compared to other crimes in most boros.  
 *  In residence, the occurence of harrassment and assult is more prevalent, while prtit larcency and criminal mischief represent more percentage of criminal types in street.  
