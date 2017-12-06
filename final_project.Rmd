@@ -194,8 +194,47 @@ for (i in 1:4) {
   return(mat)
 }
 ```
+* get results of five boros in nyc
 ```{r}
+boro = crime_type %>% distinct(boro) %>% pull()
 place_offense_result = map(boro,place_offense)
+```
+* get the description in each boro
+```{r}
+boro_plot = vector("list", length = 5)
+for (i in 1:5) {
+df_boro = as.data.frame(place_offense_result[i])
+df_boro = df_boro %>%
+rename(place=X1,top_1=X2,top_2=X3,top_3=X4) %>%
+gather(key=ofns_rank,value=ofns_desc,top_1:top_3) 
+boro_ofns = unique(df_boro$ofns_desc)
+
+boro_plot[[i]] = crime_type %>%
+  filter(prem_typ %in% c("STREET","RESIDENCE"),
+         ofns_desc %in% boro_ofns) %>%
+  ggplot(aes(x = prem_typ,fill = ofns_desc)) + geom_bar() + coord_flip() + theme_bw() +
+  theme(axis.title=element_blank())
+}  
+```
+* visualize the component of the most popular crime types in each boro
+```{r}
+library(gridExtra)
+place_boro = crime_type %>%
+  group_by(prem_typ) %>%
+  summarize(crime = n()) %>%
+  arrange(desc(crime)) %>% 
+  top_n(5)
+  top_place = place_boro$prem_typ
+ 
+   place_boro_plot = crime_type %>%
+    filter(prem_typ %in% top_place) %>%
+    ggplot(aes(x=prem_typ,fill = boro)) + geom_bar() + theme_bw() + theme(axis.text.x = element_text(angle = 15, hjust=1)) +
+    labs(title = "Five Top Places Where Crimes Usually Happen",
+    x = "Place",
+    y = "Frequency")
+
+ 
+grid.arrange(place_boro_plot,boro_plot[[1]],boro_plot[[2]],boro_plot[[3]],boro_plot[[4]],boro_plot[[5]],ncol=2,top = "Commen Types of Crime in Each Boro")
 ```
 
 ## Read crime number and visualization
