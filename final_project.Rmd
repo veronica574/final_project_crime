@@ -9,6 +9,8 @@ library(tidyverse)
 library(rvest)
 library(httr)
 library(janitor)
+library(lubridate)
+library(readxl)
 ```
 
 ```{r setup, include=FALSE}
@@ -18,6 +20,7 @@ nyc_crime_2017 = read.csv("./NYPD_Complaint_Data_Current_YTD.csv") %>%
 nyc_crime_2017 = nyc_crime_2017 %>%
   mutate(cmplnt_fr_dt = as.Date(cmplnt_fr_dt, "%m/%d/%Y")) %>%
   select(cmplnt_fr_dt, cmplnt_fr_tm, ky_cd, ofns_desc, law_cat_cd, boro_nm, prem_typ_desc, longitude, latitude) %>%
+  filter(year(cmplnt_fr_dt)  == 2017) %>%
   rename(date = cmplnt_fr_dt, time = cmplnt_fr_tm, prem_typ = prem_typ_desc, ofns_type = law_cat_cd, boro = boro_nm)
 
 crime_2017 = nyc_crime_2017 %>%
@@ -26,7 +29,43 @@ crime_2017 = nyc_crime_2017 %>%
     
 ```
 
-```{r}
 
+*Collect historic data of crimes
+```{r}
+nyc_hist_vio = read_excel("./historic/violation-offenses-2000-2016.xls", range = "A4:R6") %>%
+  mutate(ofns_type = "VIOLATION")
+
+nyc_hist_felony_7 = read_excel("./historic/seven-major-felony-offenses-2000-2016.xls", range = "A5:R12") %>%
+  mutate(ofns_type = "FELONY")
+
+nyc_hist_felony = read_excel("./historic/non-seven-major-felony-offenses-2000-2016.xls", range = "A5:R13") %>%
+  mutate(ofns_type = "FELONY")
+
+nyc_hist_mis = read_excel("./historic/misdemeanor-offenses-2000-2016.xls", range = "A4:R21")%>%
+  mutate(ofns_type = "MISDEMEANOR")
+```
+
+We combine the information of crimes in past 16 years.
+```{r}
+nyc_crime_hist = nyc_hist_mis %>%
+  full_join(nyc_hist_felony) %>%
+  full_join(nyc_hist_felony_7) %>%
+  full_join(nyc_hist_vio) %>%
+  mutate(ofns_type = as.factor(ofns_type), ofns_desc = OFFENSE) %>%
+  select(-OFFENSE)
+
+nyc_crime_hist = nyc_crime_hist %>%
+  gather(key = year, value = count, "2000":"2016") %>%
+  group_by(year, ofns_type) %>%
+  summarize(n = sum(count)/12) %>%
+  full_join(nyc_crime_2017 %>%
+  group_by(ofns_type) %>%
+  summarize(n = n()/10) %>%
+  mutate(year = "2017")) %>%
+  ungroup()
+
+nyc_crime_hist %>%
+  mutate(year = as.numeric(year)) %>%
+  ggplot(aes(x = year, y = n, fill = ofns_type)) + geom_bar(stat = "identity")
 ```
 
