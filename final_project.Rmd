@@ -172,6 +172,7 @@ library(tidytext)
 crime_words = nyc_crime_2017 %>%
   select(-longitude, -latitude) %>%
   mutate(ofns_desc = str_to_lower(ofns_desc),
+         ofns_desc = str_replace(ofns_desc, "[2-3]",""),
   ofns_desc = as.character(ofns_desc)) %>%
   unnest_tokens(word, ofns_desc)
 
