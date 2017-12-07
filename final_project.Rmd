@@ -87,9 +87,10 @@ sample %>%
 
 ### Analyzing the trend of crimes
 
-The historic data shows the trend of crimes per month from 2000 to 2016. The crime number per month is calculated by dividing total crime number by 12 months (9 for 2017 since the data of 2017 is not complete yet.)
+The historic data shows the trend of crimes per month from 2000 to 2016. The crime number per month is calculated by dividing total crime number by 12 months (9 for 2017 since the data of 2017 is not complete yet). The results indicates that the prevalence of Misdemeanor is significantly higher than Violation and Felony.
 
 We can see that overall the crime number per month are decreasing since 2000. However, misdemeanor crimes increased from 2005 to 2010, and dropped again after 2010.
+
 ```{r,echo=FALSE}
 nyc_crime_hist = nyc_crime_hist %>%
   gather(key = year, value = count, "2000":"2016") %>%
@@ -106,7 +107,7 @@ nyc_crime_hist %>%
   ggplot(aes(x = year, y = crime_count, color = ofns_type)) + geom_line() + geom_point()
 ```
 
-Focusing on the data of 2017, we made a plot showing total crime based on different offense type in the first 9 months in 2017. The results indicates that Misdemeanor is significantly higher than VIOLATION and FELONY.
+Next, we made a plot showing the distribution of crime counts in 2017 based each months and grouped by boro. Overall, the crime counts keep at a stable level through this year except for the slightly fluctuation in the crime of Misdemeanor. 
 ```{r, echo=FALSE}
 nyc_crime_2017 %>% 
   group_by(date, ofns_type) %>% 
@@ -116,7 +117,8 @@ nyc_crime_2017 %>%
     theme(legend.position = "bottom")
 ```
 
-Make a plot showing the crime numbers and crime rate based each months and grouped by boro.
+Here, we would like to make a deeper investigation about the crime numbers and crime rate based on each month this year. In order to calculate the crime rate, we need to use the population data of NYC. We get this data from the [website](http://www1.nyc.gov/site/planning/data-maps/nyc-population/current-future-populations.page). We can see from the results that Brooklyn has the most crime numbers this year, but in crime rate, Bronx is the worst. Queens is relatively safer. Also, we could find that in February, there are usually fewer crimes, that's probably because the weather in February is usually the coldest, and people tend to spend more time indoors. The decreased outgoing times helps to account for fewer crimes in cold season.
+
 ```{r, echo=FALSE}
 crime_tidy = nyc_crime_2017 %>% 
   mutate(month = month(date)) %>% 
@@ -143,20 +145,18 @@ library(ggpubr)
 ggarrange(crimetotal, crimerate, ncol = 2, common.legend = TRUE)
 ```
  
-Here, we would like to make a deeper investigation about the crime numbers and crime rate based on each month this year. In order to calculate the crime rate, we need to use the population data of NYC. We get this data from the [website](http://www1.nyc.gov/site/planning/data-maps/nyc-population/current-future-populations.page). We can see from the results that Brooklyn has the most crime numbers this year, but in crime rate, Bronx is the worst. Queens is relatively safer. Also, we could find that in February, there are usually fewer crimes, that's probably because the weather in February is usually the coldest, makes criminal less willing to go on the street.
-
 After analyzing the trend over year and month, a plot of crime count versus hour is also added. It clearly shows that crime usually happened during daytime. The peak of crimes is during 15:00 to 20:00. Between 3am and 8am, the crime numbers are relatively low.
 ```{r, echo=FALSE}
 nyc_crime_2017 %>%
   mutate(hour = hour(time)) %>%
   group_by(hour, boro) %>%
   summarize(n = n()) %>%
-  ggplot(aes(x = hour, y = n, color = boro)) + geom_point(alpha = 0.5) + geom_line()
+  ggplot(aes(x = hour, y = n, color = boro)) + geom_point(alpha = 0.9) + geom_path(aes(group = boro),alpha = .5)
 ```
 
 
 ## Common crimes types in each boro  
-We build a function to get the most prevalent crimes in each boro and illustrate the result.
+In this part, we build a function to get the most prevalent crimes in each boro and illustrate the result.
 
 ```{r,echo=FALSE}
 crime_type = nyc_crime_2017 %>%
@@ -262,15 +262,7 @@ knitr::include_graphics('./Rplot1.jpeg')
 
 # Additional analysis
 ## Assoiciation between crime and income
-In addition, we have a strong interest in finding potential factors that may associated with criminal rate. In this case, we firstly choose household income level by borough. After reading data from the web, data cleaning and data visualization, we are surprized to see from the scatter plot: Both lower-income borough and higher-income borough have an extremely high crime rate.
 
-For example, Bronx borough's family median income is 35176 dollars, associated with a crime rate of 5336.878. That is, we expect approximately 5337 crime cases among every 100000 people in bronx. Similarly, Manhattan borough's crime rate is 5184.963, which indicated that there are approximately 5185 crime cases among every 100000 people in Manhattan. In contrast, Family income ranged between 60000 dollars to 70000 dollars tends to have the lowerest crime rate. Taking Queens as an example, we expect only 2959 crime cases among every 100000 people, which has a crime rate of 2958.740.
-
-Then, we studied deeply of the reasons behind the results. Why there's a significant difference of crime rate between each borough?
-
-As for bronx, we think the main reason is the situation of lower income. Bronx family has the lowest median income among all five boroughs. The cost of living in New York City is expensive. People tend to need money for living, food, housing etc. However, facing with this problem, a proportion of lower income people would do illegal thing to make money. That can explain the reason why bronx has the highest crime rate.
-
-As for Manhattan, the situation can be a little different as the family median income reaches 75575 annually. Therefore, the main reason of extreme high crime rate cannot be low income. According to our studies, we found that Manhattan's multiculturalism and multiracial can be a factor of high crime rate. Different people from different culture and background live in Manhattan. Sometimes, it may hard to understand each other. As a result of it, conflicts may happen.
 ```{r, include = FALSE}
 nyc_crime = read_csv("./NYPD_Complaint_Data_Current_YTD.csv") %>%
   clean_names() %>%
@@ -290,7 +282,7 @@ nyc_crime_population = left_join(population, crime_number, by = "boro") %>%
   mutate(crime_rate = n / population * 100000)
 ```
 
-```{r, echo=FALSE}
+```{r, echo = FALSE}
 income = read_csv("./NYC_Income_by_Borough.csv") %>%
   clean_names() %>%
   mutate(boro = borough) %>%
@@ -298,22 +290,12 @@ income = read_csv("./NYC_Income_by_Borough.csv") %>%
 
 crime_income = left_join(income, nyc_crime_population, by = "boro")
 
-crime_income %>%
-  ggplot(aes(x = income, y = crime_rate, color = income)) + geom_point(alpha = 0.5) + geom_smooth() +
-  labs(title = "Corelation between family median income and crime rate in each borough",
+crime_income_plot = crime_income %>%
+  ggplot(aes(x = income, y = crime_rate, fill=boro)) + geom_bar(stat="identity") +
+  labs(title = "Crime Rate against Family Median Income",
        x = "Income Range",
        y = "Crime rate")
 ```
-
-Secondly, we choose unemployment rate by borough as another potential indicator. After reading data from the web, data cleaning and data visualization, we can see the results from the scatter plot: Except for Manhattan (outlier), other four boroughs result shows that the higher unemployment rate, the higher crime rate. This conclusion is similar to our assumption.
-
-Bronx has the highest unemployment rate of 6.6%, associated with the highest crime rate of 5336.878.
-
-In contrast, Queens has the lowest unemployment rate of 4.3%, associated with the lowest crime rate of 2958.740.
-
-However, this positive corelationship between unemployment rate and crime rate fails to explain the case of Manhattan with the unemployment rate of 4.4% and crime rate of 5184.963.
-
-
 ```{r, include = FALSE}
 unemployment_rate = read_excel("./BoroMonth.xls", skip = 3) %>%
   clean_names() %>%
@@ -324,13 +306,39 @@ unemployment_rate = read_excel("./BoroMonth.xls", skip = 3) %>%
 unemployment_crime = left_join(unemployment_rate, nyc_crime_population, by = "boro")
 ```
 
-```{r}
-unemployment_crime %>%
-  ggplot(aes(x = unemployment_rate, y = crime_rate, color = unemployment_rate)) + geom_point(alpha = 0.5) + geom_line() +
-  labs(title = "Corelation between unemployment rate and crime rate in each borough",
+```{r,include=FALSE}
+unemployment_crime_plot = unemployment_crime %>%
+  ggplot(aes(x = unemployment_rate, y = crime_rate, fill = boro)) + geom_bar(stat="identity") +
+  labs(title = "Crime Rate against Unemployment Rate",
        x = "Unemployment rate",
        y = "Crime rate")
+
 ```
+
+
+```{r,echo=FALSE}
+ggarrange(crime_income_plot, unemployment_crime_plot, ncol = 2, common.legend = TRUE)
+```
+
+**Comments**  
+
+*  In addition, we have a strong interest in finding potential factors that may associated with criminal rate. In this case, we firstly choose household income level by borough. It is surprising to find from the plot that both lower-income borough and higher-income borough have an extremely high crime rate.
+
+For example, Bronx borough's family median income is 35176 dollars, associated with a crime rate of 5336.878. That is, we expect approximately 5337 crime cases among every 100000 people in bronx. Similarly, Manhattan borough's crime rate is 5184.963, which indicated that there are approximately 5185 crime cases among every 100000 people in Manhattan. In contrast, Family income ranged between 60000 dollars to 70000 dollars tends to have the lowerest crime rate. Taking Queens as an example, we expect only 2959 crime cases among every 100000 people, which has a crime rate of 2958.740.
+
+Then, we studied deeply of the reasons behind the results. Why there's a significant difference of crime rate between each borough?
+
+As for bronx, we think the main reason is the situation of lower income. Bronx family has the lowest median income among all five boroughs. The cost of living in New York City is expensive. People tend to need money for living, food, housing etc. However, facing with this problem, a proportion of lower income people would do illegal thing to make money. That can explain the reason why bronx has the highest crime rate.
+
+As for Manhattan, the situation can be a little different as the family median income reaches 75575 annually. Therefore, the main reason of extreme high crime rate cannot be low income. According to our studies, we found that Manhattan's multiculturalism and multiracial can be a factor of high crime rate. Different people from different culture and background live in Manhattan. Sometimes, it is hard to get along with each other. As a result of it, conflicts may happen.
+
+*  Secondly, we choose unemployment rate by borough as another potential indicator. After reading data from the web, data cleaning and data visualization, we can see the results from the scatter plot: Except for Manhattan (outlier), other four boroughs result shows that the higher unemployment rate, the higher crime rate. This conclusion is similar to our assumption.
+
+Bronx has the highest unemployment rate of 6.6%, associated with the highest crime rate of 5336.878.
+
+In contrast, Queens has the lowest unemployment rate of 4.3%, associated with the lowest crime rate of 2958.740.
+
+However, this positive corelationship between unemployment rate and crime rate fails to explain the case of Manhattan with the unemployment rate of 4.4% and crime rate of 5184.963.
 
 
 ## Investigate offense description
