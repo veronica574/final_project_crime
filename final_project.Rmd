@@ -296,6 +296,21 @@ crime_income_plot = crime_income %>%
        x = "Income Range",
        y = "Crime rate")
 ```
+<<<<<<< HEAD
+=======
+
+## Assoiciation between crime and unemployment
+
+Secondly, we choose unemployment rate by borough as another potential indicator. After reading data from the web, data cleaning and data visualization, we can see the results from the scatter plot: Except for Manhattan (outlier), other four boroughs result shows that the higher unemployment rate, the higher crime rate. This conclusion is similar to our assumption.
+
+Bronx has the highest unemployment rate of 6.6%, associated with the highest crime rate of 5336.878.
+
+In contrast, Queens has the lowest unemployment rate of 4.3%, associated with the lowest crime rate of 2958.740.
+
+However, this positive corelationship between unemployment rate and crime rate fails to explain the case of Manhattan with the unemployment rate of 4.4% and crime rate of 5184.963.
+
+
+>>>>>>> 2dd9a0296bc3ebed320222a05279ef55935850cb
 ```{r, include = FALSE}
 unemployment_rate = read_excel("./BoroMonth.xls", skip = 3) %>%
   clean_names() %>%
