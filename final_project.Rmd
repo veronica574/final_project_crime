@@ -89,16 +89,16 @@ The historic data shows the trend of total crime numbers over years. We can see 
 nyc_crime_hist = nyc_crime_hist %>%
   gather(key = year, value = count, "2000":"2016") %>%
   group_by(year, ofns_type) %>%
-  summarize(count = sum(count)/12) %>%
+  summarize(crime_count = sum(count)/12) %>%
   full_join(nyc_crime_2017 %>%
   group_by(ofns_type) %>%
-  summarize(count = n()/9) %>%
+  summarize(crime_count = n()/9) %>%
   mutate(year = "2017")) %>%
   ungroup()
 
 nyc_crime_hist %>%
   mutate(year = as.numeric(year)) %>%
-  ggplot(aes(x = year, y = count, color = ofns_type)) + geom_line() + geom_point()
+  ggplot(aes(x = year, y = crime_count, color = ofns_type)) + geom_line() + geom_point()
 ```
 
 In 2017, we plot a bar chart showing crime number and offense type in different boros:
@@ -130,8 +130,8 @@ Make a plot of crime count versus hour in a day and group by boro. It shows that
 nyc_crime_2017 %>%
   mutate(hour = hour(time)) %>%
   group_by(hour, boro) %>%
-  summarize(n = n()) %>%
-  ggplot(aes(x = hour, y = n, color = boro)) + geom_point(alpha = 0.5) + geom_line()
+  summarize(crime_count = n()) %>%
+  ggplot(aes(x = hour, y = crime_count, color = boro)) + geom_point(alpha = 0.5) + geom_line()
 ```
 
 Make a plot showing the crime counts and crime rate based each months
