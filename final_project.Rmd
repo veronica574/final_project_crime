@@ -305,6 +305,8 @@ crime_income %>%
        y = "Crime rate")
 ```
 
+## Assoiciation between crime and unemployment
+
 Secondly, we choose unemployment rate by borough as another potential indicator. After reading data from the web, data cleaning and data visualization, we can see the results from the scatter plot: Except for Manhattan (outlier), other four boroughs result shows that the higher unemployment rate, the higher crime rate. This conclusion is similar to our assumption.
 
 Bronx has the highest unemployment rate of 6.6%, associated with the highest crime rate of 5336.878.
