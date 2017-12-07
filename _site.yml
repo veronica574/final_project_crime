@@ -1,0 +1,12 @@
+name: "Yay internet!"
+output_dir: "."
+navbar:
+  title: "Home"
+  right:
+    - text: "Written Report"
+      href: ./report/final_project.html
+    - icon: fa-github fa-lg
+      href: http://github.com/veronica574/
+output:
+  html_document:
+    theme: journal

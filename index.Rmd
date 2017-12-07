@@ -1,0 +1,9 @@
+---
+title: " Crime Research in New York City"
+subtitle: "Final Project Report for Data Science"
+author: "Qianshu Wang, He Jin, Siyuan Ding, Chuhan Zhou, Weijie Liu"
+---
+
+The violent crime rate in U.S increased by 3.4 percent nationwide in 2016 in US. As an international student, as well as a New Yorker, the public safety in NYC is always a concern to us, especially after the recent terrorists attack near the World Trade Center. Thus, our group decided to make a deeper investigation of the crime data and seek out some underlying reasons which led to the increase of crime rate.
+
+<img src="images/crime_stat.jpg" style="width:75%">
