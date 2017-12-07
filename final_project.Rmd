@@ -1,5 +1,6 @@
 ---
-title: "final_project"
+title: " Crime Research in New York City"
+subtitle: "Final Project Report for Data Science"
 author: "Qianshu Wang, He Jin, Siyuan Ding, Chuhan Zhou, Weijie Liu"
 date: "2017/12/3"
 output:
@@ -28,10 +29,10 @@ The violent crime rate in U.S increased by 3.4 percent nationwide in 2016 in US.
 The New York City Police Department provides overall crime dataset. NYPD also established a CompStat model, called [CompStat 2.0](https://compstat.nypdonline.org/2e5c3f4b-85c1-4635-83c6-22b27fe7c75c/view/89), providing greater specificity about crimes through an online interactive experience.\\
 On the official website of new york city, there is also a [Crime Map](https://maps.nyc.gov/crime/) which enables people to view crime by precinct. This map includes crimes of seven major felonies.
 
-# Data analysis
+# Data Description
 NYPD official [website](https://www1.nyc.gov/site/nypd/stats/crime-statistics/historical.page) provides citywide histroic crime data in forms of excel. We downloaded these datasets and merged them into the nyc_crime_hist. The resulting data frame contain information about the total number of offenses from 2000 to 2016 and major offense categories(felony, misdemeanor, and violation) and detailed descriptions.
 
-```{r hist}
+```{r hist, echo=FALSE}
 nyc_hist_vio = read_excel("./historic/violation-offenses-2000-2016.xls", range = "A4:R6") %>%
   mutate(ofns_type = "VIOLATION")
 
@@ -54,7 +55,7 @@ nyc_crime_hist = nyc_hist_mis %>%
 
 We focus our efforts on the data of current year 2017 which is obtained from [NYC_OpenData](https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Current-YTD/5uac-w243). It includes all valid felony, misdemeanor, and violation crimes reported to the NYPD till October in this year. The latest update of this dataset is October 25, 2017. 
 
-```{r 2017}
+```{r 2017, echo=FALSE}
 nyc_crime_2017 = read_csv("./NYPD_Complaint_Data_Current_YTD.csv") %>%
   clean_names()
 
@@ -65,7 +66,7 @@ nyc_crime_2017 = nyc_crime_2017 %>%
   rename(date = cmplnt_fr_dt, time = cmplnt_fr_tm, prem_typ = prem_typ_desc, ofns_type = law_cat_cd, boro = boro_nm)
 ```
 
-
+# Data Explorarion 
 ## Map of crimes
 Since the dataset has `r dim(nyc_crime_2017)`, we randomly sample 50000 observations and creat an interactive map showing locations where the crimes in New York City occured:
 ```{r}
@@ -79,26 +80,29 @@ sample %>%
           text = ~text_label)
 ```
 
-## Crimes types analysis
+**comments**
+
+
+## Crimes  analysis
 The historic data shows the trend of total crime numbers over years. We can see that the total number of crimes are decreasing since 2000. After 2005, the crimes numbers of misdemeanor increased and dropped again after 2010.
-```{r}
+```{r,echo=FALSE}
 nyc_crime_hist = nyc_crime_hist %>%
   gather(key = year, value = count, "2000":"2016") %>%
   group_by(year, ofns_type) %>%
-  summarize(n = sum(count)/12) %>%
+  summarize(count = sum(count)/12) %>%
   full_join(nyc_crime_2017 %>%
   group_by(ofns_type) %>%
-  summarize(n = n()/9) %>%
+  summarize(count = n()/9) %>%
   mutate(year = "2017")) %>%
   ungroup()
 
 nyc_crime_hist %>%
   mutate(year = as.numeric(year)) %>%
-  ggplot(aes(x = year, y = n, fill = ofns_type)) + geom_bar(stat = "identity")
+  ggplot(aes(x = year, y = count, color = ofns_type)) + geom_line() + geom_point()
 ```
 
 In 2017, we plot a bar chart showing crime number and offense type in different boros:
-```{r}
+```{r,include=FALSE}
 barplot = nyc_crime_2017 %>% 
   mutate(boro = fct_infreq(boro)) %>%
   ggplot(aes(x = boro, fill = ofns_type)) + geom_bar() 
@@ -107,7 +111,7 @@ ggplotly(barplot)
 ```
 
 And also in different months:
-```{r}
+```{r, echo=FALSE}
 nyc_crime_2017 %>% 
   group_by(date, ofns_type) %>% 
   summarize(crime_count = n()) %>%
@@ -118,11 +122,11 @@ nyc_crime_2017 %>%
 
 The first graph reveals the number of crime vs boro. Among 5 boros, Brooklyn has the highest number of crime in the frist 10 months in 2017. Offense type includes felony, misdemeanor and violation. Misdemeanor is the most frequent offense types across these 5 boros. Next, we made a second plot showing total crime based on different offense type in the frist 10 months in 201, the results are similar, also indicate that Misdemeanor is significantly higher than VIOLATION and FELONY.
 
-## Crime numbers and crime rate
+## Crime counts and crime rate
 We then focused on crime data of current year.
 
 Make a plot of crime count versus hour in a day and group by boro. It shows that most crimes happened between 15:00 and 20:00.
-```{r}
+```{r,echo=FALSE}
 nyc_crime_2017 %>%
   mutate(hour = hour(time)) %>%
   group_by(hour, boro) %>%
@@ -130,8 +134,8 @@ nyc_crime_2017 %>%
   ggplot(aes(x = hour, y = n, color = boro)) + geom_point(alpha = 0.5) + geom_line()
 ```
 
-Make a plot showing the crime numbers and crime rate based each months
-```{r}
+Make a plot showing the crime counts and crime rate based each months
+```{r, echo=FALSE}
 crime_tidy = nyc_crime_2017 %>% 
   mutate(month = month(date)) %>% 
   group_by(month,boro) %>% 
@@ -159,8 +163,9 @@ ggarrange(crimetotal, crimerate, ncol = 2, common.legend = TRUE)
  
 Here, we would like to make a deeper investigation about the crime numbers and crime rate based on each month this year. In order to calculate the crime rate, we need to use the population data of NYC. We get this data from the website http://www1.nyc.gov/site/planning/data-maps/nyc-population/current-future-populations.page.We can see from the results that Brooklyn has the most crime numbers this year, but in crime rate, Bronx is the worst. Queens is relatively safer. Also, we could find that in February, there are usually fewer crimes, that's probably because the weather in February is usually the coldest, makes criminal less willing to go on the street.
 
-## Common crimes types in each boro
-### Build a function to get the most prevalent crimes in each boro and illustrate the result.
+## Common crimes types in each boro  
+Build a function to get the most prevalent crimes in each boro and illustrate the result.
+
 ```{r,echo=FALSE}
 crime_type = nyc_crime_2017 %>%
     mutate(prem_typ=as.character(prem_typ),
@@ -172,7 +177,6 @@ crime_type = nyc_crime_2017 %>%
     crime_type$prem_typ[grep("COMMERCIAL",crime_type$prem_typ)] = "COMMERCIAL BLDG"
 ```
  
-
 ```{r,echo=FALSE}
 place_offense = function(x){
   crime_boro = crime_type %>% 
@@ -200,7 +204,6 @@ for (i in 1:4) {
 }
 ```
 
-
 ```{r,echo=FALSE}
 boro = crime_type %>% distinct(boro) %>% pull()
 place_offense_result = map(boro,place_offense)
@@ -226,7 +229,6 @@ boro_plot[[3]]= boro_plot[[3]] + ggtitle("Figure d - Staten Island")
 boro_plot[[4]]= boro_plot[[4]] + ggtitle("Figure e - Queens")
 boro_plot[[5]]= boro_plot[[5]] + ggtitle("Figure f - Bronx")
 ```
-
 
 ```{r,include=FALSE}
 library(gridExtra)
@@ -255,7 +257,7 @@ grid.arrange(place_boro_plot,boro_plot[[1]],
 ```{r,echo=FALSE}
 knitr::include_graphics('./Rplot.jpeg')
 ```
-
+  
 **Comments** 
 *  In Figure a, we presented the top five places where crimes usually happlen across five boros in NYC and it shows that STREET and RESIDENCE are the most unsafe places, then we will look furtherly about the major crime types in these two places for each boro.  
 *  We obtian the information of crime counts and types through the width and partitioning of bars. It is obviously to conclude that the prevalence of assault, harrassment and criminal mischief are much higher compared to other crimes in most boros.  
@@ -286,8 +288,8 @@ nyc_crime_population = left_join(population, crime_number, by = "boro") %>%
 ```
 
 
-### Corelation between median income and crime rate
-```{r}
+Corelation between median income and crime rate
+```{r, echo=FALSE}
 income = read_csv("./NYC_Income_by_Borough.csv") %>%
   clean_names() %>%
   mutate(boro = borough) %>%
@@ -302,14 +304,14 @@ crime_income %>%
        y = "Crime rate")
 ```
 
-
+**comment**  
 In addition, we have a strong interest in finding potential factors that may associated with criminal rate. In this case, we choose household income level. After reading data from the web, data cleaning and data visualization, we are surprized to see from the scatter plot: Both lower-income borough and higher-income borough have an extremely high crime rate. For example, Bronx borough's family median income is 35176 dollars, associated with a crime rate of 0.029. That is, we expect 29 crime cases among every 1000 people. In contrast, Family income ranged between 60000 dollars to 70000 dollars tends to have the lowerest crime rate. Taking Queens as an example, we expect only 15 crime cases among every 1000 people.
 
 
 
 ## Investigate offense description
 ### Top 10 words in of offense description:
-```{r}
+```{r, echo=FALSE}
 library(tidytext)
 
 crime_words = nyc_crime_2017 %>%
@@ -340,7 +342,7 @@ The graph analyzes top 10 words showing in offense description. The most frequen
 
 ###Comparison of distinct words in offense type of violation and felony.
 
-```{r}
+```{r, echo = FALSE}
 word_ratios = crime_word_tidy %>%
   filter(ofns_type %in% c("VIOLATION" , "FELONY")) %>%
   count(word, ofns_type) %>%
