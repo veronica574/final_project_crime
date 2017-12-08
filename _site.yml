@@ -4,7 +4,7 @@ navbar:
   title: "Home"
   left: 
     - text: "Data Exploration"
-      href: https://harksoul.shinyapps.io/p8105_final_project/
+      href: data_analysis.html
     - text: "Additional Analysis"
       href: add-analysis.html
   right:

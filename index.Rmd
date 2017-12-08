@@ -21,7 +21,7 @@ NYPD official [website](https://www1.nyc.gov/site/nypd/stats/crime-statistics/hi
 
 Data exploration provides the information of  the crime map of NYC, common criminal types in each boro and the frequency of crime during 24 hours in a day. Visualization in a Shinny website exhibits data directly and succinctly. All plots included are interactive, which would be helpful to grab more information while reading the graphs. 
 
-Here is a demo of our [Data Exploration](https://harksoul.shinyapps.io/p8105_final_project/). 
+Here is a demo of our [Data Exploration](data_analysis.html) and [shiny](https://harksoul.shinyapps.io/p8105_final_project/). 
 
 # Additional analysis
 

@@ -1,0 +1,107 @@
+---
+title: "Data Exploration"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(rvest)
+library(httr)
+library(janitor)
+library(lubridate)
+library(readxl)
+library(plotly)
+library(forcats)
+library(stringr)
+theme_set(theme_bw())
+```
+
+```{r hist, echo=FALSE}
+nyc_hist_vio = read_excel("./report/historic/violation-offenses-2000-2016.xls", range = "A4:R6") %>%
+  mutate(ofns_type = "VIOLATION")
+
+nyc_hist_felony_7 = read_excel("./report/historic/seven-major-felony-offenses-2000-2016.xls", range = "A5:R12") %>%
+  mutate(ofns_type = "FELONY")
+
+nyc_hist_felony = read_excel("./report/historic/non-seven-major-felony-offenses-2000-2016.xls", range = "A5:R13") %>%
+  mutate(ofns_type = "FELONY")
+
+nyc_hist_mis = read_excel("./report/historic/misdemeanor-offenses-2000-2016.xls", range = "A4:R21")%>%
+  mutate(ofns_type = "MISDEMEANOR")
+
+nyc_crime_hist = nyc_hist_mis %>%
+  full_join(nyc_hist_felony) %>%
+  full_join(nyc_hist_felony_7) %>%
+  full_join(nyc_hist_vio) %>%
+  mutate(ofns_type = as.factor(ofns_type), ofns_desc = OFFENSE) %>%
+  select(-OFFENSE)
+```
+
+```{r 2017, echo=FALSE}
+nyc_crime_2017 = read_csv("./report/NYPD_Complaint_Data_Current_YTD.csv") %>%
+  clean_names()
+
+nyc_crime_2017 = nyc_crime_2017 %>%
+  mutate(cmplnt_fr_dt = as.Date(cmplnt_fr_dt, "%m/%d/%Y")) %>%
+  select(cmplnt_fr_dt, cmplnt_fr_tm, ky_cd, ofns_desc, law_cat_cd, boro_nm, prem_typ_desc, longitude, latitude) %>%
+  filter(year(cmplnt_fr_dt)  == 2017) %>%
+  rename(date = cmplnt_fr_dt, time = cmplnt_fr_tm, prem_typ = prem_typ_desc, ofns_type = law_cat_cd, boro = boro_nm)
+```
+
+## Analyzing the changes of crime rate
+
+### Historic data from 2000 to 2017
+The historic data shows the trend of crimes per month from 2000 to 2016. The crime number per month is calculated by dividing total crime number by 12 months (9 for 2017 since the data of 2017 is not complete yet). The results indicates that the prevalence of Misdemeanor is significantly higher than Violation and Felony.
+
+We can see that overall the crime number per month are decreasing since 2000. However, misdemeanor crimes increased from 2005 to 2010, and dropped again after 2010.
+
+```{r,echo=FALSE}
+nyc_crime_hist = nyc_crime_hist %>%
+  gather(key = year, value = count, "2000":"2016") %>%
+  group_by(year, ofns_type) %>%
+  summarize(crime_count = sum(count)/12) %>%
+  full_join(nyc_crime_2017 %>%
+  group_by(ofns_type) %>%
+  summarize(crime_count = n()/9) %>%
+  mutate(year = "2017")) %>%
+  ungroup()
+
+nyc_crime_hist %>%
+  mutate(year = as.numeric(year)) %>%
+  ggplot(aes(x = year, y = crime_count, color = ofns_type)) + geom_line() + geom_point()
+```
+
+
+### Current data in 2017
+
+Here, we would like to make a deeper investigation about the crime numbers and crime rate based on each month this year. In order to calculate the crime rate, we need to use the population data of NYC. We get this data from the [website](http://www1.nyc.gov/site/planning/data-maps/nyc-population/current-future-populations.page). We can see from the results that Brooklyn has the most crime numbers this year, but in crime rate, Bronx is the worst. Queens is relatively safer. Also, we could find that in February, there are usually fewer crimes, that's probably because the weather in February is usually the coldest, and people tend to spend more time indoors. The decreased outgoing times helps to account for fewer crimes in cold season.
+
+```{r, echo=FALSE}
+crime_tidy = nyc_crime_2017 %>% 
+  mutate(month = month(date)) %>% 
+  group_by(month,boro) %>% 
+  summarize(crime_count = n())
+
+crimetotal = ggplot(crime_tidy, aes(x = month, y = crime_count, color = boro)) + 
+  geom_point() + geom_path(aes(group = boro)) +
+  theme(legend.position = "bottom")
+
+crime_rate = crime_tidy %>% 
+  mutate(popluation = recode(boro, "BRONX" = 1455720,
+                             "BROOKLYN" = 2629150,
+                             "MANHATTAN" = 1643734,
+                             "QUEENS" = 2333054,
+                             "STATEN ISLAND" = 476015)) %>% 
+  mutate(crime_rate = (crime_count/popluation)*100000)
+
+crimerate = ggplot(crime_rate, aes(x = month, y = crime_rate, color = boro)) + 
+    geom_point() + geom_path(aes(group = boro)) + 
+    theme(legend.position = "bottom")
+
+library(ggpubr)
+ggarrange(crimetotal, crimerate, ncol = 2, common.legend = TRUE)
+```
+
+## Further visualization of crime data
+
+We use Shinny to illustrate some of our  [Data Exploration](https://harksoul.shinyapps.io/p8105_final_project/), including the crime map of NYC, common criminal types in each boro and crimes number distribution in a day.

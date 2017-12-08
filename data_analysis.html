@@ -9,10 +9,9 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="author" content="Qianshu Wang, He Jin, Siyuan Ding, Chuhan Zhou, Weijie Liu" />
 
 
-<title>Crime Research in New York City</title>
+<title>Data Exploration</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -203,41 +202,28 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Crime Research in New York City</h1>
-<h3 class="subtitle"><em>Final Project Report for Data Science</em></h3>
-<h4 class="author"><em>Qianshu Wang, He Jin, Siyuan Ding, Chuhan Zhou, Weijie Liu</em></h4>
+<h1 class="title toc-ignore">Data Exploration</h1>
 
 </div>
 
 
-<p><img src="images/crime_stat.jpg" style="width:75%"></p>
-<div id="motivation" class="section level1">
-<h1>Motivation</h1>
-<p>The violent crime rate in U.S increased by 3.4 percent nationwide in 2016 in US. As an international student, as well as a New Yorker, the public safety in NYC is always a concern to us, especially after the recent terrorists attack near the World Trade Center. Thus, our group decided to make a deeper investigation of the crime data and seek out some underlying reasons which led to the increase of crime rate.</p>
+<div id="analyzing-the-changes-of-crime-rate" class="section level2">
+<h2>Analyzing the changes of crime rate</h2>
+<div id="historic-data-from-2000-to-2017" class="section level3">
+<h3>Historic data from 2000 to 2017</h3>
+<p>The historic data shows the trend of crimes per month from 2000 to 2016. The crime number per month is calculated by dividing total crime number by 12 months (9 for 2017 since the data of 2017 is not complete yet). The results indicates that the prevalence of Misdemeanor is significantly higher than Violation and Felony.</p>
+<p>We can see that overall the crime number per month are decreasing since 2000. However, misdemeanor crimes increased from 2005 to 2010, and dropped again after 2010.</p>
+<p><img src="data_analysis_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 </div>
-<div id="related-work" class="section level1">
-<h1>Related work</h1>
-<p>The New York City Police Department provides overall crime dataset. NYPD also established a CompStat model, called <a href="https://compstat.nypdonline.org/2e5c3f4b-85c1-4635-83c6-22b27fe7c75c/view/89">CompStat 2.0</a>, providing greater specificity about crimes through an online interactive experience.</p>
-<p>On the official website of new york city, there is also a <a href="https://maps.nyc.gov/crime/">Crime Map</a> which enables people to view crime by precinct. This map includes crimes of seven major felonies.</p>
+<div id="current-data-in-2017" class="section level3">
+<h3>Current data in 2017</h3>
+<p>Here, we would like to make a deeper investigation about the crime numbers and crime rate based on each month this year. In order to calculate the crime rate, we need to use the population data of NYC. We get this data from the <a href="http://www1.nyc.gov/site/planning/data-maps/nyc-population/current-future-populations.page">website</a>. We can see from the results that Brooklyn has the most crime numbers this year, but in crime rate, Bronx is the worst. Queens is relatively safer. Also, we could find that in February, there are usually fewer crimes, that’s probably because the weather in February is usually the coldest, and people tend to spend more time indoors. The decreased outgoing times helps to account for fewer crimes in cold season.</p>
+<p><img src="data_analysis_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 </div>
-<div id="data-description" class="section level1">
-<h1>Data Description</h1>
-<p>NYPD official <a href="https://www1.nyc.gov/site/nypd/stats/crime-statistics/historical.page">website</a> provides citywide histroic crime data in forms of excel. We downloaded these datasets and merged them into the nyc_crime_hist. The resulting data frame contain information about the total number of offenses from 2000 to 2016 and major offense categories(felony, misdemeanor, and violation) and detailed descriptions.</p>
 </div>
-<div id="data-explorarion" class="section level1">
-<h1>Data Explorarion</h1>
-<p>Data exploration provides the information of the crime map of NYC, common criminal types in each boro and the frequency of crime during 24 hours in a day. Visualization in a Shinny website exhibits data directly and succinctly. All plots included are interactive, which would be helpful to grab more information while reading the graphs.</p>
-<p>Here is a demo of our <a href="data_analysis.html">Data Exploration</a> and <a href="https://harksoul.shinyapps.io/p8105_final_project/">shiny</a>.</p>
-</div>
-<div id="additional-analysis" class="section level1">
-<h1>Additional analysis</h1>
-<p>Factors that would affect crime rate are what we are interested in. As a result, we analyze association between crime rate and income and also the association between crime rate and unemployment rate. Meanwhile, we also investigate the content in offense type. Top 10 words in offence type and distinct words in felony and violation are revealed in our additional analysis.</p>
-<p>Here is our <a href="add-analysis.html">Additional analysis</a></p>
-</div>
-<div id="summary" class="section level1">
-<h1>Summary</h1>
-<p>Our analysis is focusing on providing information about crimes in NYC. The map helps to visualize where crimes occured in nyc. The trend of crimes shows the change over years and months. It also demonstrates that crimes are more likely to happen during afternoon and evening. Looking at different boros, we analyzed the common crimes in each boro. Bronx relatively has more crimes.Also, the prevalence of Assault and harassment is rather higher in most boros. Among all the criminal type, misdemeanor is the most frequently one.</p>
-<p>The information about crimes aroused our interest to ask what causes the difference in crime frequency. We collected the data about income and unemployment rate and analyzed their association with crime rate. In the last part, we compare dinstinct words in offense type of felony and violation. Overall, our analysis include region, time, criminal types which associated with crimes in NYC.</p>
+<div id="further-visualization-of-crime-data" class="section level2">
+<h2>Further visualization of crime data</h2>
+<p>We use Shinny to illustrate some of our <a href="https://harksoul.shinyapps.io/p8105_final_project/">Data Exploration</a>, including the crime map of NYC, common criminal types in each boro and crimes number distribution in a day.</p>
 </div>
 
 
