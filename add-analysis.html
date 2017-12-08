@@ -20,8 +20,8 @@
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -31,12 +31,10 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs) {
-  hljs.configure({languages: []});
-  hljs.initHighlightingOnLoad();
-  if (document.readyState && document.readyState === "complete") {
-    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
-  }
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
 }
 </script>
 
@@ -178,7 +176,12 @@ $(document).ready(function () {
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        
+        <li>
+  <a href="data-explor.html">Data Exploration</a>
+</li>
+<li>
+  <a href="add-analysis.html">Additional Analysis</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -204,8 +207,21 @@ $(document).ready(function () {
 </div>
 
 
-<div id="here-is-additional-analysis" class="section level3">
-<h3>Here is Additional analysis</h3>
+<p><img src="add-analysis_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<div id="investigation-of-offense-type" class="section level3">
+<h3>Investigation of Offense Type</h3>
+<p><img src="add-analysis_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<ul>
+<li>Top 10 words showing in offense description.</li>
+<li>The most frequent one is larceny, which appears nearly 100000 times.</li>
+<li>Others include petit, assault and harrassment.</li>
+</ul>
+<p><img src="add-analysis_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<ul>
+<li>Comparison of dinstinct words in offense type of felony and violation.</li>
+<li>Dinstinct words in felony are larceny, grand and assault.</li>
+<li>Dinstinct words in violation are harrassment, code and administrative.</li>
+</ul>
 </div>
 
 

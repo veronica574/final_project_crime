@@ -2,4 +2,160 @@
 title: "Additional analysis"
 ---
 
-### Here is Additional analysis
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(rvest)
+library(httr)
+library(janitor)
+library(lubridate)
+library(readxl)
+library(plotly)
+library(forcats)
+library(stringr)
+library(gridExtra)
+library(grid)
+library(ggpubr)
+library(tidytext)
+theme_set(theme_bw())
+
+
+
+nyc_crime_2017 = read_csv("./report/NYPD_Complaint_Data_Current_YTD.csv") %>%
+  clean_names()
+
+nyc_crime_2017 = nyc_crime_2017 %>%
+  mutate(cmplnt_fr_dt = as.Date(cmplnt_fr_dt, "%m/%d/%Y")) %>%
+  select(cmplnt_fr_dt, cmplnt_fr_tm, ky_cd, ofns_desc, law_cat_cd, boro_nm, prem_typ_desc, longitude, latitude) %>%
+  filter(year(cmplnt_fr_dt)  == 2017) %>%
+  rename(date = cmplnt_fr_dt, time = cmplnt_fr_tm, prem_typ = prem_typ_desc, ofns_type = law_cat_cd, boro = boro_nm)
+```
+
+
+```{r, include = FALSE}
+nyc_crime = read_csv("./report/NYPD_Complaint_Data_Current_YTD.csv") %>%
+  clean_names() %>%
+  select(boro = boro_nm)
+
+crime_number = nyc_crime %>%
+  group_by(boro) %>%
+  summarise(n = n()) 
+
+population = read_csv("./report/NYC_Population_by_Borough.csv") %>%
+  mutate(boro = Borough) %>%
+  select(-Borough)
+
+nyc_crime_population = left_join(population, crime_number, by = "boro") %>%
+  clean_names() %>%
+  mutate(population = as.numeric(population)) %>%
+  mutate(crime_rate = n / population * 100000)
+```
+
+```{r, echo = FALSE}
+income = read_csv("./report/NYC_Income_by_Borough.csv") %>%
+  clean_names() %>%
+  mutate(boro = borough) %>%
+  select(-borough)
+
+crime_income = left_join(income, nyc_crime_population, by = "boro")
+
+crime_income_plot = crime_income %>%
+  ggplot(aes(x = income, y = crime_rate, fill=boro)) + geom_bar(stat="identity") +
+  labs(title = "Crime Rate against Family Median Income",
+       x = "Income Range",
+       y = "Crime rate")
+```
+
+```{r, include = FALSE}
+unemployment_rate = read_excel("./report/BoroMonth.xls", skip = 3) %>%
+  clean_names() %>%
+  select(boro, unemployment) %>%
+  mutate(unemployment_rate = unemployment) %>%
+  select(-unemployment)
+
+unemployment_crime = left_join(unemployment_rate, nyc_crime_population, by = "boro")
+```
+
+```{r,include=FALSE}
+unemployment_crime_plot = unemployment_crime %>%
+  ggplot(aes(x = unemployment_rate, y = crime_rate, fill = boro)) + geom_bar(stat="identity") +
+  labs(title = "Crime Rate against Unemployment Rate",
+       x = "Unemployment rate",
+       y = "Crime rate")
+
+```
+
+
+```{r,echo=FALSE}
+ggarrange(crime_income_plot, unemployment_crime_plot, ncol = 2, common.legend = TRUE)
+```
+
+###Investigation of Offense Type
+
+```{r,  echo = FALSE}
+
+
+crime_words = nyc_crime_2017 %>%
+  select(-longitude, -latitude) %>%
+  mutate(ofns_desc = str_to_lower(ofns_desc),
+         ofns_desc = str_replace(ofns_desc, "[2-3]",""),
+  ofns_desc = as.character(ofns_desc)) %>%
+  unnest_tokens(word, ofns_desc)
+
+data(stop_words)
+
+crime_word_tidy = 
+  anti_join(crime_words, stop_words)
+
+
+crime_word_tidy %>% 
+  count(word, sort = TRUE) %>% 
+  top_n(10) %>% 
+  mutate(word = fct_reorder(word, n)) %>% 
+  ggplot(aes(x = word, y = n)) + 
+  geom_bar(stat = "identity", fill = "blue", alpha = .6) + 
+  coord_flip()+ ggtitle("Top 10 Words in Offense Type")
+```
+
+
+* Top 10 words showing in offense description. 
+* The most frequent one is larceny, which appears nearly 100000 times. 
+* Others include petit, assault and harrassment.
+
+```{r, echo = FALSE}
+word_ratios = crime_word_tidy %>%
+  filter(ofns_type %in% c("VIOLATION" , "FELONY")) %>%
+  count(word, ofns_type) %>%
+  group_by(word) %>% 
+  filter(sum(n) >= 5) %>%
+  ungroup() %>%
+  spread(ofns_type, n, fill = 0) %>%
+  mutate(
+    violation_odds = (VIOLATION + 1) / (sum(VIOLATION) + 1),
+    felony_odds = (FELONY + 1) / (sum(FELONY) + 1),
+    log_OR = log(felony_odds / violation_odds)
+  ) %>%
+  arrange(desc(log_OR)) 
+
+
+word_ratios %>%
+  mutate(pos_log_OR = ifelse(log_OR > 0,  "felony_odds >violation_odds" ,"violation_odds > felony_odds")) %>% 
+  group_by(pos_log_OR) %>%
+  top_n(10, abs(log_OR)) %>%
+  ungroup() %>%
+  mutate(word = fct_reorder(word, log_OR)) %>%
+  ggplot(aes(word, log_OR, fill = pos_log_OR)) +
+  geom_col() +
+  coord_flip() +
+  ylab("log odds ratio (felony_odds/violation_odds)") +
+  scale_fill_discrete(name = "") +
+  theme(legend.position = "bottom") +
+  ggtitle("Distinct Words in Offense Type of Violation and Felony")
+```
+
+
+* Comparison of dinstinct words in offense type of felony and violation. 
+* Dinstinct words in felony are larceny, grand and assault.
+* Dinstinct words in violation are harrassment, code and administrative.
