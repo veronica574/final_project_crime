@@ -21,8 +21,8 @@
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/default.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -32,10 +32,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -224,13 +226,13 @@ $(document).ready(function () {
 <h1>Data Description</h1>
 <p>NYPD official <a href="https://www1.nyc.gov/site/nypd/stats/crime-statistics/historical.page">website</a> provides citywide histroic crime data in forms of excel. We downloaded these datasets and merged them into the nyc_crime_hist. The resulting data frame contain information about the total number of offenses from 2000 to 2016 and major offense categories(felony, misdemeanor, and violation) and detailed descriptions.</p>
 </div>
-<div id="data-explorarion" class="section level1">
-<h1>Data Explorarion</h1>
-<p>Data exploration provides the information of the crime map of NYC, common criminal types in each boro and the frequency of crime during 24 hours in a day. Visualization in a Shinny website exhibits data directly and succinctly. All plots included are interactive, which would be helpful to grab more information while reading the graphs.</p>
-<p>Here is a demo of our <a href="data_analysis.html">Data Exploration</a> and <a href="https://harksoul.shinyapps.io/p8105_final_project/">shiny</a>.</p>
+<div id="data-exploration" class="section level1">
+<h1>Data Exploration</h1>
+<p>Data exploration provides the information of the crime map of NYC, common criminal types in each boro, the frequency of crime during 24 hours in a day, etc. Visualization in a Shinny website exhibits data directly and succinctly. All plots included are interactive, which would be helpful to grab more information while reading the graphs.</p>
+<p>Here is a demo of our <a href="data_analysis.html">Data Exploration</a> and <a href="https://harksoul.shinyapps.io/p8105_final_project/">Shiny</a>.</p>
 </div>
 <div id="additional-analysis" class="section level1">
-<h1>Additional analysis</h1>
+<h1>Additional Analysis</h1>
 <p>Factors that would affect crime rate are what we are interested in. As a result, we analyze association between crime rate and income and also the association between crime rate and unemployment rate. Meanwhile, we also investigate the content in offense type. Top 10 words in offence type and distinct words in felony and violation are revealed in our additional analysis.</p>
 <p>Here is our <a href="add-analysis.html">Additional analysis</a></p>
 </div>

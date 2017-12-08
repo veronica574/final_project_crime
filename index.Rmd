@@ -17,13 +17,13 @@ On the official website of new york city, there is also a [Crime Map](https://ma
 # Data Description
 NYPD official [website](https://www1.nyc.gov/site/nypd/stats/crime-statistics/historical.page) provides citywide histroic crime data in forms of excel. We downloaded these datasets and merged them into the nyc_crime_hist. The resulting data frame contain information about the total number of offenses from 2000 to 2016 and major offense categories(felony, misdemeanor, and violation) and detailed descriptions.
 
-# Data Explorarion
+# Data Exploration
 
-Data exploration provides the information of  the crime map of NYC, common criminal types in each boro and the frequency of crime during 24 hours in a day. Visualization in a Shinny website exhibits data directly and succinctly. All plots included are interactive, which would be helpful to grab more information while reading the graphs. 
+Data exploration provides the information of  the crime map of NYC, common criminal types in each boro, the frequency of crime during 24 hours in a day, etc. Visualization in a Shinny website exhibits data directly and succinctly. All plots included are interactive, which would be helpful to grab more information while reading the graphs. 
 
-Here is a demo of our [Data Exploration](data_analysis.html) and [shiny](https://harksoul.shinyapps.io/p8105_final_project/). 
+Here is a demo of our [Data Exploration](data_analysis.html) and [Shiny](https://harksoul.shinyapps.io/p8105_final_project/). 
 
-# Additional analysis
+# Additional Analysis
 
 Factors that would affect crime rate are what we are interested in. As a result, we analyze association between crime rate and income and also the association between crime rate and unemployment rate. Meanwhile, we also investigate the content in offense type. Top 10 words in offence type and distinct words in felony and violation are revealed in our additional analysis.
 

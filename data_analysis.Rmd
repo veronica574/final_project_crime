@@ -104,4 +104,4 @@ ggarrange(crimetotal, crimerate, ncol = 2, common.legend = TRUE)
 
 ## Further visualization of crime data
 
-We use Shinny to illustrate some of our  [Data Exploration](https://harksoul.shinyapps.io/p8105_final_project/), including the crime map of NYC, common criminal types in each boro and crimes number distribution in a day.
+We use [Shiny](https://harksoul.shinyapps.io/p8105_final_project/) to illustrate some of our Data Exploration, including the crime map of NYC, common criminal types in each boro and crimes number distribution in a day.
