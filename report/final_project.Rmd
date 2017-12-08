@@ -113,7 +113,7 @@ nyc_crime_2017 %>%
   group_by(date, ofns_type) %>% 
   summarize(crime_count = n()) %>%
   ggplot(aes(x = date, y = crime_count, color = ofns_type)) + 
-    geom_point(alpha = .6) + geom_smooth() + 
+    geom_point(alpha = .7) + geom_smooth(aes(group = ofns_type)) + 
     theme(legend.position = "bottom")
 ```
 
