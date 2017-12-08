@@ -67,7 +67,7 @@ nyc_crime_2017 = nyc_crime_2017 %>%
   rename(date = cmplnt_fr_dt, time = cmplnt_fr_tm, prem_typ = prem_typ_desc, ofns_type = law_cat_cd, boro = boro_nm)
 ```
 
-# Data Explorarion 
+# Data Exploration
 ## Map of crimes
 Since the dataset has `r dim(nyc_crime_2017)` observations, we randomly sample 50000 observations to creat an interactive map showing locations where the crimes in New York City occured.
 

@@ -2,6 +2,11 @@ name: "Yay internet!"
 output_dir: "."
 navbar:
   title: "Home"
+  left: 
+    - text: "Data Exploration"
+      href: data-explor.html
+    - text: "Additional Analysis"
+      href: add-analysis.html
   right:
     - text: "Written Report"
       href: ./report/final_project.html
