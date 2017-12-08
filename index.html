@@ -21,8 +21,8 @@
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -32,12 +32,10 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs) {
-  hljs.configure({languages: []});
-  hljs.initHighlightingOnLoad();
-  if (document.readyState && document.readyState === "complete") {
-    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
-  }
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
 }
 </script>
 
@@ -228,16 +226,18 @@ $(document).ready(function () {
 </div>
 <div id="data-explorarion" class="section level1">
 <h1>Data Explorarion</h1>
-<p>Here is a demo of our <a href="https://harksoul.shinyapps.io/p8105_final_project/">Data Exploration</a>. We use Shinny to illustrate some of our data exploration, including the crime map of NYC, common criminal types in each boro and crimes number distribution in a day.</p>
+<p>Data exploration provides the information of the crime map of NYC, common criminal types in each boro and the frequency of crime during 24 hours in a day. Visualization in a Shinny website exhibits data directly and succinctly. All plots included are interactive, which would be helpful to grab more information while reading the graphs.</p>
+<p>Here is a demo of our <a href="https://harksoul.shinyapps.io/p8105_final_project/">Data Exploration</a>.</p>
 </div>
 <div id="additional-analysis" class="section level1">
 <h1>Additional analysis</h1>
+<p>Factors that would affect crime rate are what we are interested in. As a result, we analyze association between crime rate and income and also the association between crime rate and unemployment rate. Meanwhile, we also investigate the content in offense type. Top 10 words in offence type and distinct words in felony and violation are revealed in our additional analysis.</p>
 <p>Here is our <a href="add-analysis.html">Additional analysis</a></p>
 </div>
 <div id="summary" class="section level1">
 <h1>Summary</h1>
-<p>Our analysis in focusing on providing information about crimes in NYC. The map helps to visualize where crimes occured in nyc. The trend of crimes shows the change over years and months. It also demonstrates that crimes are more likely to happen during afternoon and evening instead of mid night and early morning. Looking at different boros, we analyzed the common crimes in each boro. Bronx relatively has more crimes while Queens relatively is safest boro in NYC. Among all the criminal type, misdemeanor is the most frequently one.</p>
-<p>The information about crimes aroused our interest to ask what causes the difference in crime frequency. We collect the data about income and unemployment and analyze their association with crime rate. Since we only have 5 boros in nyc, there are not clear and strong evidence to show a significant relation.</p>
+<p>Our analysis is focusing on providing information about crimes in NYC. The map helps to visualize where crimes occured in nyc. The trend of crimes shows the change over years and months. It also demonstrates that crimes are more likely to happen during afternoon and evening. Looking at different boros, we analyzed the common crimes in each boro. Bronx relatively has more crimes.Also, the prevalence of Assault and harassment is rather higher in most boros. Among all the criminal type, misdemeanor is the most frequently one.</p>
+<p>The information about crimes aroused our interest to ask what causes the difference in crime frequency. We collected the data about income and unemployment rate and analyzed their association with crime rate. In the last part, we compare dinstinct words in offense type of felony and violation. Overall, our analysis include region, time, criminal types which associated with crimes in NYC.</p>
 </div>
 
 

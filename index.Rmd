@@ -18,12 +18,18 @@ On the official website of new york city, there is also a [Crime Map](https://ma
 NYPD official [website](https://www1.nyc.gov/site/nypd/stats/crime-statistics/historical.page) provides citywide histroic crime data in forms of excel. We downloaded these datasets and merged them into the nyc_crime_hist. The resulting data frame contain information about the total number of offenses from 2000 to 2016 and major offense categories(felony, misdemeanor, and violation) and detailed descriptions.
 
 # Data Explorarion
-Here is a demo of our [Data Exploration](https://harksoul.shinyapps.io/p8105_final_project/). We use Shinny to illustrate some of our data exploration, including the crime map of NYC, common criminal types in each boro and crimes number distribution in a day.
+
+Data exploration provides the information of  the crime map of NYC, common criminal types in each boro and the frequency of crime during 24 hours in a day. Visualization in a Shinny website exhibits data directly and succinctly. All plots included are interactive, which would be helpful to grab more information while reading the graphs. 
+
+Here is a demo of our [Data Exploration](https://harksoul.shinyapps.io/p8105_final_project/). 
 
 # Additional analysis
+
+Factors that would affect crime rate are what we are interested in. As a result, we analyze association between crime rate and income and also the association between crime rate and unemployment rate. Meanwhile, we also investigate the content in offense type. Top 10 words in offence type and distinct words in felony and violation are revealed in our additional analysis.
+
 Here is our [Additional analysis](add-analysis.html) 
 
 # Summary
-Our analysis in focusing on providing information about crimes in NYC. The map helps to visualize where crimes occured in nyc. The trend of crimes shows the change over years and months. It also demonstrates that crimes are more likely to happen during afternoon and evening instead of mid night and early morning. Looking at different boros, we analyzed the common crimes in each boro. Bronx relatively has more crimes while Queens relatively is safest boro in NYC. Among all the criminal type, misdemeanor is the most frequently one. 
+Our analysis is focusing on providing information about crimes in NYC. The map helps to visualize where crimes occured in nyc. The trend of crimes shows the change over years and months. It also demonstrates that crimes are more likely to happen during afternoon and evening. Looking at different boros, we analyzed the common crimes in each boro. Bronx relatively has more crimes.Also, the prevalence of Assault and harassment is rather higher in most boros. Among all the criminal type, misdemeanor is the most frequently one.
 
-The information about crimes aroused our interest to ask what causes the difference in crime frequency. We collect the data about income and unemployment and analyze their association with crime rate. Since we only have 5 boros in nyc, there are not clear and strong evidence to show a significant relation.
+The information about crimes aroused our interest to ask what causes the difference in crime frequency. We collected the data about income and unemployment rate and analyzed their association with crime rate. In the last part, we compare dinstinct words in offense type of felony and violation. Overall, our analysis include region, time, criminal types which associated with crimes in NYC.
