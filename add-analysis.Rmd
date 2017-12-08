@@ -1,9 +1,9 @@
 ---
-title: "Additional analysis"
+title: "Additional Analysis"
 ---
 
 
-###Assoiciations between crime and income and between crime and unemployment
+###Assoiciations Between Crime and Income/Unemployment
 ```{r, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, message = FALSE, warning = FALSE)
 library(tidyverse)
@@ -20,8 +20,6 @@ library(grid)
 library(ggpubr)
 library(tidytext)
 theme_set(theme_bw())
-
-
 
 nyc_crime_2017 = read_csv("./report/NYPD_Complaint_Data_Current_YTD.csv") %>%
   clean_names()
@@ -100,7 +98,6 @@ ggarrange(crime_income_plot, unemployment_crime_plot, ncol = 2, common.legend = 
 ###Investigation of Offense Type
 
 ```{r,  echo = FALSE}
-
 
 crime_words = nyc_crime_2017 %>%
   select(-longitude, -latitude) %>%
