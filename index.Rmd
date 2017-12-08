@@ -18,7 +18,7 @@ On the official website of new york city, there is also a [Crime Map](https://ma
 NYPD official [website](https://www1.nyc.gov/site/nypd/stats/crime-statistics/historical.page) provides citywide histroic crime data in forms of excel. We downloaded these datasets and merged them into the nyc_crime_hist. The resulting data frame contain information about the total number of offenses from 2000 to 2016 and major offense categories(felony, misdemeanor, and violation) and detailed descriptions.
 
 # Data Explorarion
-Here is a demo of our [Data Exploration](https://harksoul.shinyapps.io/p8105_final_project/) 
+Here is a demo of our [Data Exploration](https://harksoul.shinyapps.io/p8105_final_project/). We use Shinny to illustrate some of our data exploration, including the crime map of NYC, common criminal types in each boro and crimes number distribution in a day.
 
 # Additional analysis
 Here is our [Additional analysis](add-analysis.html) 

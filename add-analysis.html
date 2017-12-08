@@ -11,7 +11,7 @@
 
 
 
-<title>Additional analysis</title>
+<title>Additional Analysis</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -20,8 +20,8 @@
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/default.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -31,10 +31,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -177,7 +179,7 @@ $(document).ready(function () {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="data-explor.html">Data Exploration</a>
+  <a href="https://harksoul.shinyapps.io/p8105_final_project/">Data Exploration</a>
 </li>
 <li>
   <a href="add-analysis.html">Additional Analysis</a>
@@ -202,13 +204,13 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Additional analysis</h1>
+<h1 class="title toc-ignore">Additional Analysis</h1>
 
 </div>
 
 
-<div id="assoiciations-between-crime-and-income-and-between-crime-and-unemployment" class="section level3">
-<h3>Assoiciations between crime and income and between crime and unemployment</h3>
+<div id="assoiciations-between-crime-and-incomeunemployment" class="section level3">
+<h3>Assoiciations Between Crime and Income/Unemployment</h3>
 <p><img src="add-analysis_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <ul>
 <li><p>We choose household income level by borough. According to the results, both lower-income borough Bronx and higher-income borough Manhattan have the highest crime rate. Middle-income boroughs are associated with lower crime rate.</p></li>

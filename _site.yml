@@ -3,7 +3,7 @@ output_dir: "."
 navbar:
   title: "Home"
   left: 
-    - text: "Data Exploration Demo"
+    - text: "Data Exploration"
       href: https://harksoul.shinyapps.io/p8105_final_project/
     - text: "Additional Analysis"
       href: add-analysis.html
