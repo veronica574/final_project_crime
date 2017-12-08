@@ -248,17 +248,30 @@ p = grid.arrange(place_boro_plot,boro_plot[[1]],
 ggsave("Rplot1.jpeg", p, width = 12, height = 8, scale = 1)
 ```
 
+```{r,echo=FALSE,message=FALSE}
+library(DT)
+df_boro = rbind(place_offense_result[[1]],place_offense_result[[2]],place_offense_result[[3]],place_offense_result[[4]],place_offense_result[[5]])
+boro1=rep(boro,each = 4)
+
+df_boro = cbind(boro1,df_boro) 
+df_boro = as.data.frame(df_boro) %>%
+rename(boro=boro1,place=V2,top_1=V3,top_2=V4,top_3=V5) 
+
+datatable(df_boro)
+
+```
+
 ```{r,echo=FALSE}
 knitr::include_graphics('./Rplot1.jpeg')
 ```
   
 **Comments** 
 
-*  In Figure a, we presented the top five places where crimes usually happlen across five boros in NYC and it shows that STREET and RESIDENCE are the most unsafe places, then we will look furtherly about the major crime types in these two places for each boro.  
+*  In table, we tried to summarize the major criminal types in the top four places where crimes usually happen across five boros in NYC. It shows that **STREET** and **RESIDENCE** are the most unsafe places. The trend in figure a also verifies our conclusion. Therefore, we will next look furtherly about the major crime types in these two places for each boro.
 *  We obtian the information of crime counts and types through the width and partitioning of bars. It is obviously to conclude that the prevalence of assault, harrassment and criminal mischief are much higher compared to other crimes in most boros.  
 *  In residence, the occurence of harrassment and assult is more prevalent, while prtit larcency and criminal mischief represent more percentage of criminal types in street.  
 *  Next, we want to compare the major criminal types in different boros. From Figure b-f, we found that the distribution of crimes are similar among Manhattan, Brooklyn, State Island and Queen. However, the characteristic of crimes in Bronx appeares to be more complex. Specificlly, the nature of crimes in Bronx is usually more serious than the other four boros, with the occurence of FELONY ASSAULT and DANGEROUS DRUGS, which belong to felony.  
-*  Overall,the safty level in Manhattan, State Island and Queens in relatively higher
+*  Overall, the safty level in Manhattan, State Island and Queens in relatively higher among the five boroughs.
 
 # Additional analysis
 ## Assoiciations between crime and income and between crime and unemployment
