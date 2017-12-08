@@ -3,7 +3,7 @@ title: "Additional analysis"
 ---
 
 
-
+###Assoiciations between crime and income and between crime and unemployment
 ```{r, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, message = FALSE, warning = FALSE)
 library(tidyverse)
@@ -63,7 +63,7 @@ crime_income = left_join(income, nyc_crime_population, by = "boro")
 
 crime_income_plot = crime_income %>%
   ggplot(aes(x = income, y = crime_rate, fill=boro)) + geom_bar(stat="identity") +
-  labs(title = "Crime Rate against Family Median Income",
+  labs(title = "Crime Rate against Median Income",
        x = "Income Range",
        y = "Crime rate")
 ```
@@ -81,7 +81,7 @@ unemployment_crime = left_join(unemployment_rate, nyc_crime_population, by = "bo
 ```{r,include=FALSE}
 unemployment_crime_plot = unemployment_crime %>%
   ggplot(aes(x = unemployment_rate, y = crime_rate, fill = boro)) + geom_bar(stat="identity") +
-  labs(title = "Crime Rate against Unemployment Rate",
+  labs(title = "Crime Rate against Unemployment",
        x = "Unemployment rate",
        y = "Crime rate")
 
@@ -91,6 +91,11 @@ unemployment_crime_plot = unemployment_crime %>%
 ```{r,echo=FALSE}
 ggarrange(crime_income_plot, unemployment_crime_plot, ncol = 2, common.legend = TRUE)
 ```
+
+* We choose household income level by borough. According to the results, both lower-income borough Bronx and higher-income borough Manhattan have the highest crime rate. Middle-income boroughs are associated with lower crime rate.
+
+* Let unemployment rate by borough be another potential indicator. From the results, all boroughs prove a positive correlation between unemployment rate and crime rate, except for Manhattan.Middle-income boroughs are associated with lower crime rate.
+
 
 ###Investigation of Offense Type
 
