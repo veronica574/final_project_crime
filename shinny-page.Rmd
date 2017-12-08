@@ -1,0 +1,138 @@
+---
+title: "Data Exploration Demo"
+date: "12/7/2017"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: row
+    source_code: embed
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(rvest)
+library(httr)
+library(janitor)
+library(stringr)
+library(forcats)
+library(viridis)
+library(plotly)
+library(shiny)
+library(rsconnect)
+library(ggplot2)
+library(lubridate)
+```
+
+```{r}
+crime_2017 = read_csv("NYPD_Complaint_Data_Current_YTD.csv") %>%
+clean_names()
+crime_2017 = crime_2017 %>%
+  mutate(cmplnt_fr_dt = as.Date(cmplnt_fr_dt, "%m/%d/%Y")) %>%
+  select(cmplnt_fr_dt, cmplnt_fr_tm, ky_cd, ofns_desc, law_cat_cd, boro_nm, prem_typ_desc, longitude, latitude) %>%
+  filter(year(cmplnt_fr_dt)  == 2017) %>%
+  rename(date = cmplnt_fr_dt, time = cmplnt_fr_tm, prem_typ = prem_typ_desc, ofns_type = law_cat_cd, boro = boro_nm)
+```
+
+```{r}
+crime_type = crime_2017 %>%
+    mutate(prem_typ=as.character(prem_typ),
+           boro=as.character(boro),
+           ofns_type=as.factor(ofns_type),
+           ofns_desc=as.character(ofns_desc))
+    
+    crime_type$prem_typ[grep("RESIDENCE",crime_type$prem_typ)] = "RESIDENCE"
+    crime_type$prem_typ[crime_type$prem_typ==""]<-"OTHER"
+    crime_type$prem_typ[grep("COMMERCIAL",crime_type$prem_typ)] = "COMMERCIAL BLDG"
+```
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r sidebar_input}
+# selectInput widget
+boro = crime_2017 %>% distinct(boro) %>% pull()
+selectInput("boro_choice", label = h3("Choose Borough"),
+            choices = boro, selected = "MANHATTAN")
+
+# sliderInput widget
+
+dateRangeInput("dates", label = h3("Date range"), start = "2017-01-01", end = "2017-09-30", min = "2017-01-01", max = "2017-09-30")
+
+# radioButtons widget
+
+level = crime_2017 %>% distinct(ofns_type) %>% pull()
+radioButtons("offense_level", label = h3("Choose offense level"), choices = level, selected = "FELONY")
+```
+ 
+Row
+-----------------------------------------------------------------------
+
+### Common criminal types in each boro
+
+```{r}
+renderPlotly({ 
+   offense_select = crime_type %>%
+  filter( prem_typ %in% c("STREET","RESIDENCE"),
+          #boro =="BRONX") %>%
+          boro == input$boro_choice) %>%
+  group_by(ofns_desc) %>%
+  summarize(crime = n()) %>%
+    arrange(desc(crime)) %>%
+    top_n(10) 
+    top_offense = offense_select$ofns_desc
+  
+crime_plot =  crime_type %>%
+filter(prem_typ %in% c("STREET","RESIDENCE"), ofns_desc %in% top_offense) %>%
+filter(
+       boro == input$boro_choice,
+       #boro == "BRONX")
+       ofns_type == input$offense_level,
+       between(date, input$dates[1], input$dates[2])) 
+
+#plotly(x = ~ prem_typ, color = ~ofns_desc, type = "bar")
+plot_1 = ggplot(crime_plot, aes(x = prem_typ,fill = ofns_desc)) + geom_bar() + coord_flip() + theme_bw() +
+theme(axis.title=element_blank()) 
+
+ggplotly(plot_1)
+  
+})
+```
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Crime map
+
+```{r}
+renderPlotly({ 
+sample <- crime_2017[sample(1:nrow(crime_2017), 50000,replace=FALSE),] %>% 
+  filter(boro == input$boro_choice, ofns_type == input$offense_level) %>%
+  filter(between(date, input$dates[1], input$dates[2])) %>%
+  mutate(text_label = str_c("Offense desc:", ofns_desc, ' Boro: ', boro)) %>% 
+  plot_ly(x = ~longitude, y = ~latitude, type = "scatter", mode = "markers",
+          alpha = 0.5, 
+          color = ~ofns_type,
+          text = ~text_label)
+
+})
+```
+
+### Crimes numbers in a day
+
+```{r}
+renderPlotly({
+  p = crime_2017 %>%
+    filter(boro == input$boro_choice, ofns_type == input$offense_level) %>%
+    filter(between(date, input$dates[1], input$dates[2])) %>%
+  mutate(hour = hour(time)) %>%
+  group_by(hour, boro) %>%
+  summarize(n = n()) %>%
+  ggplot(aes(x = hour, y = n, color = boro)) + geom_point(alpha = 0.5) + 
+    geom_path(aes(group = boro))
+  
+  ggplotly(p)
+})
+```
+
+
+
